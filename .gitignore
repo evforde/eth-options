@@ -1,1 +1,7 @@
+node_modules/
+.DS_Store
+.env
+package-lock.json
+public/pre-js/
+public/pre-css/
 build
