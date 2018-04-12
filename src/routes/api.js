@@ -6,7 +6,7 @@ const router = express.Router();
 
 
 
-// api endpoints
+// api endpoints... use for authentication!!!!!!!!
 // router.get('/whoami', function(req, res) {
 //
 //     if(user in database....) {

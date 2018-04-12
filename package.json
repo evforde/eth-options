@@ -18,9 +18,14 @@
   },
   "homepage": "https://github.com/evforde/eth-options#readme",
   "dependencies": {
+    "async": "^2.6.0",
     "body-parser": "^1.18.2",
     "express": "^4.16.3",
     "express-session": "^1.15.6",
+    "ipfs": "^0.28.2",
+    "level": "^3.0.0",
+    "leveldown": "^3.0.0",
+    "levelup": "^2.0.2",
     "npm": "^5.8.0",
     "web3": "^1.0.0-beta.33"
   },
