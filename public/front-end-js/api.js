@@ -56,8 +56,12 @@ function post(endpoint, params, successCallback, failureCallback) {
       }
     }
   };
-  xhr.onerror = function(err) {
-    reject(xhr.statusText);
-  };
+  // xhr.onerror = function(err) {
+  //   reject(xhr.statusText);
+  // };
+  xhr.onerror = function () {
+      console.log("ERROR HERE", xhr.status);
+};
+// console.log(params, 'MY params');
   xhr.send(JSON.stringify(params));
 }

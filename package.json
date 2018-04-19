@@ -23,6 +23,7 @@
     "express": "^4.16.3",
     "express-session": "^1.15.6",
     "ipfs": "^0.28.2",
+    "ipfs-daemon": "^0.3.1",
     "level": "^3.0.0",
     "leveldown": "^3.0.0",
     "levelup": "^2.0.2",

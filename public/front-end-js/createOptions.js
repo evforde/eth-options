@@ -1,4 +1,17 @@
-const ipfs = require('./src/back-end-js/IPFS');
+class Option {
+  constructor(maturity, ETHStrikePrice, ETHcurrent, optionPrice, user) {
+      this.maturity = maturity
+  }
+  // // Getter
+  // get area() {
+  //   return this.calcArea();
+  // }
+}
+
+// const square = new Rectangle(10, 10);
+
+
+
 
 function triggerCreateOption() {
 
@@ -13,16 +26,27 @@ function triggerCreateOption() {
         ETHStrikePrice = "$1000"
         ETHcurrent = "$500";
         optionPrice = "$10";
+        console.log('writing to ipfs');
+        const curOption = new Option(maturity, ETHStrikePrice, ETHcurrent, optionPrice, 'ricky')
 
-
+        sendToIPFS(curOption);
 })
 }
 
 triggerCreateOption();
 
 
-function sendToIPF(payload) {
+function sendToIPFS(payload) {
+
+    post("/api/appendToIPFS", {
+        data: payload,
+        maturity: payload.maturity,
+        // ETHStrikePrice: ETHStrikePrice,
+        // ETHcurrent: ETHcurrent,
+        // optionPrice: optionPrice,
 
 
-
+    }, function(result) {
+        return;
+    });
 }

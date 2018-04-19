@@ -6,10 +6,12 @@ const bodyParser = require('body-parser');
 const web3 = require('web3');
 
 // back end dependencies
+const ipfs = require('./back-end-js/IPFS')
 
 // local dependencies
 const views = require('./routes/views');
 const api = require('./routes/api')
+
 
 
 // initialize express app
@@ -32,11 +34,20 @@ app.use('/', views);
 app.use('/api', api);
 app.use('/static', express.static('public'));
 
+
+// POSTs
+
+
+
+// GETs
+
 // usage
 // app.get('/endpoint', callback_function(req, res) {
 //
 //     req.redirect('another_endpoint');
 // })
+
+
 
 
 

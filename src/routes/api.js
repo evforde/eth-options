@@ -2,9 +2,12 @@
 const express = require('express');
 const router = express.Router();
 
-// models
+// local dependencies
+const IPFS = require("../back-end-js/IPFS.js");
 
 
+
+// GETs
 
 // api endpoints... use for authentication!!!!!!!!
 // router.get('/whoami', function(req, res) {
@@ -17,6 +20,19 @@ const router = express.Router();
 //     }
 // });
 
+
+// POSTs
+
+
+router.post("/appendToIPFS", function(req, res) {
+
+    // console.log(req, ' monkey ', res);
+    // console.log('body to here', req.body);
+    IPFS.sendToIPFS(req.body);
+    res.send({response: "success"});
+
+    // res.send
+});
 
 
 module.exports = router;
