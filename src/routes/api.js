@@ -9,16 +9,11 @@ const IPFS = require("../back-end-js/IPFS.js");
 
 // GETs
 
-// api endpoints... use for authentication!!!!!!!!
-// router.get('/whoami', function(req, res) {
-//
-//     if(user in database....) {
-//         res.send(req.user);
-//     }
-//     else{
-//         res.send({});
-//     }
-// });
+router.get("/getFromIPFS", function(req, res) {
+    //TODO fix
+    data = IPFS.getFromIPFS(req.body);
+    res.send(data);
+});
 
 
 // POSTs

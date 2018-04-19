@@ -40,13 +40,19 @@ function sendToIPFS(payload) {
 
     post("/api/appendToIPFS", {
         data: payload,
-        maturity: payload.maturity,
+        maturity: payload.maturity
         // ETHStrikePrice: ETHStrikePrice,
         // ETHcurrent: ETHcurrent,
         // optionPrice: optionPrice,
 
 
     }, function(result) {
-        return;
-    });
+        console.log("result from post is", result);
+        return result;
+    },
+        function(err) {
+            console.log(err, "error from post");
+            return err;
+        }
+    );
 }
