@@ -41,15 +41,19 @@ function sendToIPFS(dataToSend) {
 
         console.log('\nFile content:')
         process.stdout.write(data)
-    }),
+    },
+    console.log("hi2")
+),
 
 ],
     function(err, result) {
+        if (err) { return "error" }
+        return "success";
         console.log(fileMultihash, 'si');
     }
-
 )
 }
+
 
 
 

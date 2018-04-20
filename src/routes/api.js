@@ -21,12 +21,9 @@ router.get("/getFromIPFS", function(req, res) {
 
 router.post("/appendToIPFS", function(req, res) {
 
-    // console.log(req, ' monkey ', res);
     // console.log('body to here', req.body);
-    IPFS.sendToIPFS(req.body);
-    res.send({response: "success"});
-
-    // res.send
+    result = IPFS.sendToIPFS(req.body);
+    res.send({response: result});
 });
 
 
