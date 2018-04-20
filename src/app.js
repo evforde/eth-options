@@ -2,12 +2,17 @@
 const http = require('http');
 const express = require('express');
 const session = require('express-session');
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
+const web3 = require('web3');
 
 // back end dependencies
+const ipfs = require('./back-end-js/IPFS')
 
 // local dependencies
-const views = require('./routes/views')
+const views = require('./routes/views');
+const api = require('./routes/api')
+
+
 
 // initialize express app
 const app = express();
@@ -24,17 +29,25 @@ app.use(session({
 }));
 
 
-
 // set routes
 app.use('/', views);
-// app.use('/api', api);
+app.use('/api', api);
 app.use('/static', express.static('public'));
+
+
+// POSTs
+
+
+
+// GETs
 
 // usage
 // app.get('/endpoint', callback_function(req, res) {
 //
 //     req.redirect('another_endpoint');
 // })
+
+
 
 
 
@@ -58,7 +71,7 @@ app.use(function(err, req, res, next) {
 });
 
 // port config
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 7545;
 const server = http.Server(app);
 server.listen(port, function() {
   console.log('Server running on port: ' + port);

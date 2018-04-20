@@ -1,12 +1,32 @@
-
 <!DOCTYPE html>
 <html>
    <head>
-      <title>ETH Options Trading</title>
+      <title>ETH</title>
+      <script src="/static/front-end-js/metamask.js"></script>
+      <script src="/static/front-end-js/api.js"></script>
+      <script src="https://unpkg.com/ipfs/dist/index.min.js"></script>
+
 
    </head>
    <body>
-       Hello how are you?
+       Home:
+
+       Create Option Contract Here:
+
+       <div class="createOptionRow">
+
+           <div id="optionExpiry">2019:01:01</div>
+
+           <div id="ETHStrikePrice">$1000</div>
+           <div id="ETHcurrent">$500</div>
+
+           <div id="optionPrice">$10</div>
+
+           <button id="optionOffer">Create Bid</button>
+
+       </div>
 
    </body>
+   <script src="/static/front-end-js/createOptions.js"></script>
+
 </html>
