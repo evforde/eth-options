@@ -8,15 +8,16 @@ const loginMessage = [
  }
 ];
 
+$("window").ready(function() {
+
 $("#login").click(function() {
   getMetamaskAccount(function(account) {
-    console.log("Account:", account);
     signMessage(loginMessage, account, function(result) {
       if (!result.success) {
-        console.log("Couldn't sign login message: ", result.err);
+        alert("Could not authenticate");
         return;
       }
-      console.log("sig", result.signature)
+
       $.ajax({
         type: "POST",
         url: "/api/authenticate",
@@ -26,9 +27,14 @@ $("#login").click(function() {
           sender: account
         },
         success: function(res) {
-          console.log(res);
+          if (res.success)
+            window.location = "/dashboard";
+          else 
+            alert("Could not authenticate");
         }
       });
     });
   });
+});
+
 });

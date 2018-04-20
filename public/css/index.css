@@ -1,18 +1,3 @@
-@import url(http://fonts.googleapis.com/css?family=Raleway|Open+Sans);
-
-html {
-  margin: 0;
-}
-
-body {
-  margin: 0;
-  overflow: hidden;
-}
-
-* {
-  font-family: "Raleway", sans-serif;
-}
-
 #login {
   margin: 12px;
   padding: 6px 24px;

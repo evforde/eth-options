@@ -4,7 +4,16 @@ const router = express.Router();
 
 // public endpoints
 router.get('/', function(req, res, next) {
-  res.sendFile('main.html', { root: 'src/views' });
+  // TODO(eforde): if authed, send right to dashboard
+  res.sendFile('index.html', { root: 'src/views' });
+});
+
+router.get('/dashboard', function(req, res, next) {
+  if (!req.user) {
+    res.redirect('/');
+    return;
+  }
+  res.sendFile('dashboard.html', { root: 'src/views' });
 });
 
 router.get('/unfulfilled', function(req, res, next) {
