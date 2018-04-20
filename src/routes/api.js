@@ -4,6 +4,7 @@ const router = express.Router();
 
 // local dependencies
 const IPFS = require("../back-end-js/IPFS.js");
+const auth = require("../back-end-js/metamask-auth.js");
 
 
 
@@ -11,7 +12,7 @@ const IPFS = require("../back-end-js/IPFS.js");
 
 router.get("/getFromIPFS", function(req, res) {
     //TODO fix
-    data = IPFS.getFromIPFS(req.body);
+    const data = IPFS.getFromIPFS(req.body);
     res.send(data);
 });
 
@@ -22,8 +23,13 @@ router.get("/getFromIPFS", function(req, res) {
 router.post("/appendToIPFS", function(req, res) {
 
     // console.log('body to here', req.body);
-    result = IPFS.sendToIPFS(req.body);
-    res.send({response: result});
+    const result = IPFS.sendToIPFS(req.body);
+    res.send({ response: result });
+});
+
+router.post("/authenticate", function(req, res, next) {
+    const result = auth.authenticate(req.body);
+    res.send({ response: result });
 });
 
 

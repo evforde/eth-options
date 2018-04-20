@@ -4,7 +4,8 @@
   "description": "Need to install [truffle](https://github.com/trufflesuite/truffle):",
   "main": "truffle-config.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon src/app.js"
   },
   "repository": {
     "type": "git",
@@ -20,10 +21,13 @@
   "dependencies": {
     "async": "^2.6.0",
     "body-parser": "^1.18.2",
+    "eth-sig-util": "^1.4.2",
+    "ethereumjs-util": "^5.1.5",
     "express": "^4.16.3",
     "express-session": "^1.15.6",
     "ipfs": "^0.28.2",
     "ipfs-daemon": "^0.3.1",
+    "jsonwebtoken": "^8.2.1",
     "level": "^3.0.0",
     "leveldown": "^3.0.0",
     "levelup": "^2.0.2",
