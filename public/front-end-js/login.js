@@ -26,7 +26,7 @@ $("#login").click(function() {
           sender: account
         },
         success: function(res) {
-          // TODO(eforde): save jwt
+          console.log(res);
         }
       });
     });

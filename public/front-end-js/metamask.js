@@ -47,7 +47,7 @@ function signMessage(message, sender, callback) {
       return;
     }
     callback({ success: true, signature: result.result });
-  })
+  });
 }
 
 // console.log(web3.eth.getBalance(0x3a99e67c96e546b34b0fd74f5f93f8692bc2eb92))
