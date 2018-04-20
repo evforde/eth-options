@@ -36,8 +36,8 @@ function getMetamaskAccount(callback) {
 function signMessage(message, sender, callback) {
   web3.currentProvider.sendAsync({
     id: 1,
-    method: 'personal_sign',
-    params: [sender, message],
+    method: 'eth_signTypedData',
+    params: [message, sender],
     from: sender,
   },
   function (err, result) {
