@@ -10,17 +10,26 @@
 </head>
 
 <body>
-  <h1>Hello, <%= user %>!</h1>
-  <p>
-    Home:
-    Create Option Contract Here:
-  </p>
-  <div class="createOptionRow">
-    <div id="optionExpiry">2019:01:01</div>
-    <div id="ETHStrikePrice">$1000</div>
-    <div id="ETHcurrent">$500</div>
-    <div id="optionPrice">$10</div>
-    <button id="optionOffer">Create Bid</button>
+  <div id="header">
+    <span id="title">eth</span>
+  </div>
+  <div id="page">
+    <div class="container">
+      <div class="content">
+        <h1>Hello, <%= user %>!</h1>
+        <p>
+          Home:
+          Create Option Contract Here:
+        </p>
+        <div class="createOptionRow">
+          <div id="optionExpiry">2019:01:01</div>
+          <div id="ETHStrikePrice">$1000</div>
+          <div id="ETHcurrent">$500</div>
+          <div id="optionPrice">$10</div>
+          <button id="optionOffer">Create Bid</button>
+        </div>
+      </div>
+    </div>
   </div>
 </body>
 <!-- TODO: move this to the head -->

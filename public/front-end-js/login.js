@@ -27,8 +27,12 @@ $("#login").click(function() {
           sender: account
         },
         success: function(res) {
-          if (res.success)
-            window.location = "/dashboard";
+          if (res.success) {
+            $("#container").addClass("collapsed");
+            setTimeout(function() {
+              window.location = "/dashboard";
+            }, 200);
+          }
           else 
             alert("Could not authenticate");
         }
