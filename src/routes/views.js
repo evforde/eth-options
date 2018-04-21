@@ -1,24 +1,22 @@
 // dependencies
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
-// public endpoints
-router.get('/', function(req, res, next) {
-  // TODO(eforde): if authed, send right to dashboard
-  res.sendFile('index.html', { root: 'src/views' });
+router.get("/", function(req, res, next) {
+  res.render("index");
 });
 
-router.get('/dashboard', function(req, res, next) {
-  if (!req.user) {
-    res.redirect('/');
-    return;
-  }
-  res.sendFile('dashboard.html', { root: 'src/views' });
+router.get("/index", function(req, res, next) {
+  res.redirect("/");
 });
 
-router.get('/unfulfilled', function(req, res, next) {
+router.get("/dashboard", function(req, res, next) {
+  res.render("dashboard", { user: req.user });
+});
+
+router.get("/unfulfilled", function(req, res, next) {
   // could add authentication here... if authetnicated:
-  res.sendFile('unfulfilled_options.html', { root: 'src/views' });
+  res.render("unfulfilled_options", { user: req.user });
 });
 
 

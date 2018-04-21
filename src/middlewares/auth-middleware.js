@@ -9,6 +9,9 @@ function checkAuthentication(req, res, next) {
       next();
     });
   }
+  else {
+    next();
+  }
 };
 
 module.exports = function() {

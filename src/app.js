@@ -5,57 +5,48 @@ const session      = require('express-session');
 const bodyParser   = require('body-parser');
 const web3         = require('web3');
 const cookieParser = require('cookie-parser')
+const logger       = require('morgan');
+const path         = require('path');
 
 // back end dependencies
 const authMiddleware = require("./middlewares/auth-middleware.js");
-
-// local dependencies
-const views = require('./routes/views');
-const api = require('./routes/api')
+const views          = require('./routes/views.js');
+const api            = require('./routes/api.js');
 
 // initialize express app
 const app = express();
 
-// use cookies
 app.use(cookieParser());
-
-// check jwt token if provided
-app.use(authMiddleware());
-
-// set POST request body parser
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-
-// set up sessions
+app.use(logger("dev"));
 app.use(session({
-  secret: 'session-secret',
+  secret: 'MIGeMA0GCSqGSIb3DQEBAQUAA4GFADCBwAKBgHu8A19UsKk97bkS9BWZozXT1BGTkZn2qB+WcAmU7Y4u3+DN9WTR4sItFSre5JVG9ZkdZmxz3In9elKaPJLFatYjTWtsHSbwYMFKhlHkFjD2LXYAlcsEDVPapoJC429CoUFFywlEpB8sPbdA+v4xKZZvlT3RNxlfu+NrzBdj6yutAgMBAAr=',
   resave: 'false',
   saveUninitialized: 'true'
 }));
 
-// set routes
-app.use('/', views);
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+
+// authenticate users
+app.use(authMiddleware());
+
+// register unauthenticated routes first
 app.use('/api', api);
 app.use('/static', express.static('public'));
 
-// POSTs
-
-
-
-// GETs
-
-// usage
-// app.get('/endpoint', callback_function(req, res) {
-//
-//     req.redirect('another_endpoint');
-// })
-
-
-
-
-
-
-
+// restrict unauthenticated users to only / view
+app.use(function(req, res, next) {
+  if (req.user || req.url === '/') {
+    next();
+  } else {
+    req.session.error = 'Access denied!';
+    res.redirect('/');
+  }
+});
+app.use('/', views);
 
 // 404 route
 app.use(function(req, res, next) {

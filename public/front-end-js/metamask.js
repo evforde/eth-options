@@ -1,14 +1,12 @@
 var web3;
 
 if (typeof web3 !== 'undefined') {
+  // Metamask found
   web3 = new Web3(web3.currentProvider);
-  console.log('Using current provider (metmask)')
 } else {
-  // set the provider you want from Web3.providers
-  // should use metamask
-  // TODO(eforde): ricky, what is this?
-  web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:3000"));
+  alert("Please use Chrome with the metamask extension installed");
 }
+
 
 
 // Grabs the first metamask account.
