@@ -32,7 +32,7 @@ function sendToIPFS(payload) {
 $(document).ready(function() {
 
 $("#optionOffer").click(function() {
-  // use jQuery to get option params
+  // use jQueryc to get option params
 
   maturity = "2019:01:01";
   ETHStrikePrice = "$1000"

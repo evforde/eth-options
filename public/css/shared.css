@@ -30,7 +30,8 @@ p, span, h1, h2 {
 }
 #page {
   position: relative;
-  top: 62px;
+  top: 0px;
+  padding-top: 62px;
 	min-height: calc(100vh - 72px);
 	border-bottom: 12px solid #4e4e9d;
 }
