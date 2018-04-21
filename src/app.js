@@ -1,21 +1,26 @@
 // libraries
-const http = require('http');
-const express = require('express');
-const session = require('express-session');
-const bodyParser = require('body-parser');
-const web3 = require('web3');
+const http         = require('http');
+const express      = require('express');
+const session      = require('express-session');
+const bodyParser   = require('body-parser');
+const web3         = require('web3');
+const cookieParser = require('cookie-parser')
 
 // back end dependencies
-const ipfs = require('./back-end-js/IPFS')
+const authMiddleware = require("./middlewares/auth-middleware.js");
 
 // local dependencies
 const views = require('./routes/views');
 const api = require('./routes/api')
 
-
-
 // initialize express app
 const app = express();
+
+// use cookies
+app.use(cookieParser());
+
+// check jwt token if provided
+app.use(authMiddleware());
 
 // set POST request body parser
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -28,12 +33,10 @@ app.use(session({
   saveUninitialized: 'true'
 }));
 
-
 // set routes
 app.use('/', views);
 app.use('/api', api);
 app.use('/static', express.static('public'));
-
 
 // POSTs
 
@@ -63,6 +66,7 @@ app.use(function(req, res, next) {
 
 // route error handler
 app.use(function(err, req, res, next) {
+  console.log(err);
   res.status(err.status || 500);
   res.send({
     status: err.status,
@@ -76,7 +80,6 @@ const server = http.Server(app);
 server.listen(port, function() {
   console.log('Server running on port: ' + port);
 });
-
 
 // // for performance reasons on heroku
 // setInterval(function() {

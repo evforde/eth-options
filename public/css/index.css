@@ -1,0 +1,15 @@
+#login {
+  margin: 12px;
+  padding: 6px 24px;
+  background-color: #900;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #fff;
+  transition: all .2s ease-in-out;
+  display: inline-block;
+}
+
+#login:hover {
+  transform: scale(1.04);
+  background-color: #800;
+}
