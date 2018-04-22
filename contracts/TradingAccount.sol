@@ -1,49 +1,102 @@
 pragma solidity ^0.4.17;
 
+// - A user engaging in contractual agreement will create a trading account and
+//   deposit funds
+// - When they enter into an options contract, they authorize the address of the
+//   smart contract to access their funds by calling authorize(addr)
+// - The option smart contract will then reserve funds by calling reserve(amt),
+//   which enforces that the user does not withdraw funds reserved by an
+//   outstanding agreement
+// - It is the option smart contract's job after expiry or exercising to either
+//   return reserved funds to users' trading accounts or take the funds and
+//   distribute accordingly
+
 contract TradingAccount {
   address public owner;
 
-  // Balance reserved for existing, active option contracts
-  uint public reserved_balance;
+  struct Reservation {
+    bool isAuthorized;
+    uint amount;
+  }
 
-  // Addresses authorized to access the funds of this trading account.
+  // Addresses authorized to access the funds of this trading account mapped to
+  // the amount of funds each has reserved.
   // Should include all option contracts in which this trading account is an agent.
-  address[] public authorized_addresses;
+  mapping(address => Reservation) public authorized_reservations;
 
-  function TradingAccount() public {
+  // Should always equal the sum of values in authorized_reservations
+  uint reserved_balance;
+
+  constructor() public {
     owner = msg.sender;
+    reserved_balance = 0;
   }
 
-  function verify(address p, bytes32 hash, uint8 v, bytes32 r, bytes32 s) private pure returns(bool) {
-    // Note: this only verifies that signer is correct.
-    // You'll also need to verify that the hash of the data
-    // is also correct.
-    return ecrecover(hash, v, r, s) == p;
+  //
+  // Getters
+  //
+
+  function getBalance() public view returns (uint256) {
+    return address(this).balance;
   }
 
-  function authorize(address addr) public {
-    // TODO: verify message signature
-    authorized_addresses.push(addr);
+  function amAuthorized() public view returns(bool) { // for testing
+    return isAuthorized(msg.sender);
+  }
+
+  //
+  // Actions performed by client
+  //
+
+  function () public payable {
   }
 
   function withdraw(uint amount) public returns (bool) {
-    if (amount > this.balance) {
-      amount = this.balance;
-    }
-    if (msg.sender == owner || isAuthorized(msg.sender)) {
+    uint max_amount = address(this).balance - reserved_balance;
+    require(amount <= max_amount);
+    if (msg.sender == owner) {
       msg.sender.transfer(amount);
       return true;
     }
     return false;
   }
 
-  function isAuthorized(address addr) private constant returns (bool) {
-    // Check if address is authorized
-    for (uint i = 0; i < authorized_addresses.length; i++) {
-      if (addr == authorized_addresses[i])
-        return true;
+  function authorize(address addr) public {
+    require(msg.sender == owner);
+    require(addr != owner);
+    if (isAuthorized(msg.sender)) {
+      return; // do nothing
     }
-    return false;
+    else {
+      authorized_reservations[msg.sender].isAuthorized = true;
+      authorized_reservations[msg.sender].amount = 0;
+    }
   }
 
+  //
+  // Actions performed by Option smart contract
+  //
+
+  function setReservation(uint amount) public {
+    require(isAuthorized(msg.sender));
+    reserved_balance -= authorized_reservations[msg.sender].amount;
+    authorized_reservations[msg.sender].amount = amount;
+    reserved_balance += amount;
+  }
+
+  function withdrawReservation() public {
+    require(isAuthorized(msg.sender));
+    uint reservation = authorized_reservations[msg.sender].amount;
+    authorized_reservations[msg.sender].amount = 0;
+    msg.sender.transfer(reservation);
+    reserved_balance -= reservation;
+  }
+
+  //
+  // Helpers
+  //
+
+  function isAuthorized(address addr) public view returns (bool) {
+    return authorized_reservations[addr].isAuthorized;
+  }
 }
