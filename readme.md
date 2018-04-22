@@ -1,7 +1,5 @@
-Need to install [truffle](https://github.com/trufflesuite/truffle):
+Need to install [solc-js](https://github.com/ethereum/solc-js):
 
 ```bash
-$ npm install -g truffle
+$ npm install -g solc
 ```
-
-
