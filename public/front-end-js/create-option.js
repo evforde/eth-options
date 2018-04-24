@@ -8,6 +8,23 @@ class Option {
   // }
 }
 
+
+// ---------WORKFLOW FOR CREATING OPTION --------
+//
+// 1) WHEN CREATE BUTTON PRESSED LISTEN
+//
+// 2) CREATE OPTION CONTRACT (have unfulfilled status) (get smart contract address and save)
+//
+// 3) send ETH (either premium or the collateral to smart contract)
+// web3.eth.sendTransaction({from: acct1, to:acct2, value: web3.toWei(1, 'ether'), gasLimit: 21000, gasPrice: 20000000000})
+//
+// 4) upload the optin to ipfs
+//
+// 5) update list of unfulfilled options
+//
+// 6) update list of 'my options' tab
+
+
 function sendToIPFS(payload) {
   $.ajax({
     type: "POST",

@@ -13,13 +13,15 @@ contract Option {
 
     address public buyer; // address returned from TradingAccount.sol
     address public seller;
-    uint public creationTime;
+    uint public optionCreationTime;
     bytes32 public optionType; // put/call
     uint public numberETH;
-    uint public timeOptionCreated;
+    uint public optionFulfilledTime;
     uint public curETHPrice;
     uint public ETHStrikePrice;
     uint public maturityDate;
+    string public optionCreatorType
+    uint public premiumAmount;
 
     // Nuking enums to get stack depth under control
     enum OptionType {call, put}
@@ -33,33 +35,57 @@ contract Option {
 
     // constructor
     function Option(
-      address buyer, address seller, uint creationTime,
-      bytes32 optionType, uint numberETH, uint timeOptionCreated,
+      address optionCreatorAddress, string optionCreatorType, uint optionCreationTime,
+      bytes32 optionType, uint numberETH,
       uint curETHPrice, uint ETHStrikePrice, uint maturityDate, uint premium) public {
-        buyer = msg.sender;
-        seller = seller;
-        creationTime = creationTime;
-        optionType = optionType;
-        numberETH = numberETH;
-        timeOptionCreated = timeOptionCreated;
-        curETHPrice = curETHPrice;
+
+
+        // set buyer/seller based on optionCreatorType
+
+        optionCreatorAddress = msg.sender;
+        optionCreatorType = optionCreatorType; //buyer/seller
+        optionType = optionType; // put/call
+        numberETH = numberETH; // option value
+        optionCreationTime = optionCreationTime;
         ETHStrikePrice = ETHStrikePrice;
         maturityDate = maturityDate;
-
-        payPremium(premium);
-    }
-
-    function payPremium(uint premium) {
-
-
     }
 
 
-    function inTheMoney() public constant returns (bool) {
+    // call after Option constructed!
+    function initialDeposit(amount, optionCreatorType) payable public {
+      // either premium or collateral
+      require(msg.value == amount);
+      // deposits mapping? bookeeping if necessary
+      if optionCreatorType == "buyer" {
+        premiumAmount = amount;
+      }
+      else {
+        require(msg.value == numberETH);
+      }
 
-        if ....
-        return true;
     }
+
+
+
+    function attemptFulfillment() {
+      // see if there's another dude
+
+
+    }
+
+    function fulfillOption() {
+
+      uint public optionFulfilledTime;
+      curETHPrice = curETHPrice;
+
+
+
+
+    }
+
+
+
 
 
     function exerciseOption(){
@@ -72,11 +98,16 @@ contract Option {
 
 
 
-        _isActive = false;
-        _isComplete = false;
-        _maturity = maturity;
-        _transaction = OneToOneTransaction(sender, receiver, msg.value);
 
+
+    // ===== Utility functions ===== //
+
+
+    function inTheMoney() public constant returns (bool) {
+
+        if ....
+        return true;
+    }
 
 
     // If SOME INVLALIDITY??, allow sender to withdraw
@@ -115,6 +146,10 @@ contract Option {
         return true;
     }
 
-    // ===== Utility functions ===== //
+
+    // ======= Log Events ========= //
+
+    _transaction = OneToOneTransaction(sender, receiver, msg.value);
+
 
 }
