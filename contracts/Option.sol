@@ -1,155 +1,196 @@
 pragma solidity ^0.4.0;
 
 //kill ? (can it ever be killed by someone)
-
-/* exercise option function -> send ether if strike price */
-/* pay premium function -> transfer to seller */
-
-/* For example, calling suicide(address) sends all of the contract's current balance to address. */
-// uses less GAS!
+// TODO keep track of balance?
 
 
 contract Option {
 
-    address public buyer; // address returned from TradingAccount.sol
-    address public seller;
-    uint public optionCreationTime;
-    bytes32 public optionType; // put/call
-    uint public numberETH;
-    uint public optionFulfilledTime;
-    uint public curETHPrice;
-    uint public ETHStrikePrice;
-    uint public maturityDate;
-    string public optionCreatorType
-    uint public premiumAmount;
+  address public optionBuyer; // address returned from TradingAccount.sol
+  address public optionSeller;
+  uint public optionCreationTime;
+  bool public optionType; // put = True, call = False
+  bool public optionCreatorType; // optionBuyer = True, optionSeller = False
+  bool public traderType; // optionBuyer = True, optionSeller = False
+  uint public numberETH;
+  /* uint public optionFulfilledTime;TODO remove? */
+  uint public curETHPrice;
+  uint public strikePriceUSD;
+  uint public maturityDate;
+  uint public premiumAmount;
 
-    // Nuking enums to get stack depth under control
-    enum OptionType {call, put}
-    enum Stages {outTheMoney, inTheMoney}
-
-    Stages public curStage = Stages.outTheMoney;
-
-    // events
-
-    event LogTransferMade(address sender, address receiver, uint amount);
-
-    // constructor
-    function Option(
-      address optionCreatorAddress, string optionCreatorType, uint optionCreationTime,
-      bytes32 optionType, uint numberETH,
-      uint curETHPrice, uint ETHStrikePrice, uint maturityDate, uint premium) public {
+  uint public contractBalance;
 
 
-        // set buyer/seller based on optionCreatorType
+  // Nuking enums to get stack depth under control? enum vs bool vs uint memory sizing?
+  /* enum OptionType {call, put} */
+  enum Stages {outTheMoney, inTheMoney, unfulfilled, exercised}
 
-        optionCreatorAddress = msg.sender;
-        optionCreatorType = optionCreatorType; //buyer/seller
-        optionType = optionType; // put/call
-        numberETH = numberETH; // option value
-        optionCreationTime = optionCreationTime;
-        ETHStrikePrice = ETHStrikePrice;
-        maturityDate = maturityDate;
-    }
+  // events
 
+  event LogTransferMade(address sender, address receiver, uint amount);
 
-    // call after Option constructed!
-    function initialDeposit(amount, optionCreatorType) payable public {
-      // either premium or collateral
-      require(msg.value == amount);
-      // deposits mapping? bookeeping if necessary
-      if optionCreatorType == "buyer" {
-        premiumAmount = amount;
+  // constructor
+  function Option(
+    address optionCreatorAddress, bool optionCreatorType,
+    uint optionCreationTime, bool optionType, uint numberETH,
+    uint strikePriceUSD, uint maturityDate, uint premiumAmount) public {
+
+      require(msg.sender == optionCreatorAddress);
+      optionCreatorAddress = msg.sender;
+      optionCreatorType = optionCreatorType; //optionBuyer = True, optionSeller = False
+      optionType = optionType; // put = True, call = False
+      numberETH = numberETH; // option value
+      optionCreationTime = optionCreationTime;
+      strikePriceUSD = strikePriceUSD;
+      maturityDate = maturityDate;
+      premiumAmount = premiumAmount;
+
+      contractBalance = address(this).balance;
+
+      // set optionBuyer/optionSeller based on optionCreatorType
+      if (optionCreatorType) {
+        optionBuyer = optionCreatorAddress;
       }
       else {
-        require(msg.value == numberETH);
+        optionSeller = optionCreatorAddress;
       }
+      Stages public currentStage = Stages.unfulfilled;
+  }
 
+
+  // call after Option constructed!
+  function initialDeposit(uint amount, bool optionCreatorType) payable public {
+    // TODO wei vs ether
+    require(msg.value == amount);
+    // optionBuyer
+    if (optionCreatorType) {
+      require(amount == premiumAmount);
+    }
+    else {
+      // optionSeller
+      require(amount == numberETH);
     }
 
+  }
 
-
-    function attemptFulfillment() {
-      // see if there's another dude
-
-
+  function attemptFulfillment(address tradingAccountAddress, bool traderType, uint amount, uint curETHPrice) payable public returns (bool) {
+    if (currentStage == Stages.unfulfilled) {
+      fulfillOption(tradingAccountAddress, traderType, amount, curETHPrice);
+      return true;
     }
+    return false;
+  }
 
-    function fulfillOption() {
+  function fulfillOption(address tradingAccountAddress, bool traderType, uint curETHPrice) payable private {
+    // TODO wei vs ether
+    require(msg.value == amount);
+    curETHPrice = curETHPrice;
 
-      uint public optionFulfilledTime;
-      curETHPrice = curETHPrice;
-
-
-
-
+    if (traderType) {
+      require(amount == premiumAmount);
+      optionBuyer = tradingAccountAddress;
     }
-
-
-
-
-
-    function exerciseOption(){
-    // require = assert
-    require(!checkPlayerExists(msg.sender));
-
-    transfer()
-
+    else {
+      require(amount == numberETH);
+      optionSeller = tradingAccountAddress;
     }
+    // option fulfilled !
+    Stages currentStage = Stages.outTheMoney;
 
+    // transfer premiumAmount to optionSeller
+    optionSeller.transfer(uint premiumAmount);
+  }
 
+  function exerciseOption(uint currentETHPrice) public returns (bool) {
 
-
-
-    // ===== Utility functions ===== //
-
-
-    function inTheMoney() public constant returns (bool) {
-
-        if ....
+    require(msg.sender == optionBuyer);
+    // TODO figure out put
+    if (optionType) {
+      return false;
+    }
+    // call
+    else {
+      if (inTheMoney(currentETHPrice)) {
+        //less gass
+        require(numberETH == address(this).balance); //should be equal!
+        suicide(optionBuyer);
+        /* optionBuyer.transfer(numberETH); */
+        Stages currentStage = Stages.exercised;
         return true;
+      }
+      else {
+        return false;
+      }
+    }
+  }
+
+
+
+  function deleteOption(address tradingAccountAddress) public returns (bool) {
+    if (currentStage = Stages.unfulfilled) {
+      if (tradingAccountAddress == optionCreatorAddress) {
+        // suicide less gas!
+        suicide(tradingAccountAddress);
+        /* tradingAccountAddress.transfer(address(this).balance); */
+      }
     }
 
+    else {
+      return false;
+    }
+  }
 
-    // If SOME INVLALIDITY??, allow sender to withdraw
-    function withdraw() returns (bool val) {
-        if(_isActive || _isComplete) {
-            return false;
-        }
-        _transaction.sender.send(this.balance);
-        // suicide(_transaction.sender);
-        _isActive = false;
-        _isComplete = true;
+
+
+  // ===== Utility functions ===== //
+
+  function checkPlayerExists(address tradingAccountAddress) private returns (bool) {
+    if (tradingAccountAddress == optionBuyer) || (tradingAccountAddress == optionSeller) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+
+
+  /* Stages public currentStage = Stages.outTheMoney; */
+
+  function inTheMoney(uint curETHPrice) private returns (bool) {
+    // put
+    if (optionType) {
+      if (curETHPrice < strikePriceUSD) {
+        Stages currentStage = Stages.inTheMoney;
         return true;
+      }
+      else {
+        Stages currentStage = Stages.outTheMoney;
+        return false;
+      }
     }
-
-    // If condition is met on maturity, allow receiver to claim from escrow
-    function trigger() returns (bool val) {
-        if (!_isActive || _isComplete || !isConditionMet()) {
-            return false;
-        }
-        _transaction.receiver.send(this.balance);
-        // suicide(_transaction.receiver);
-        _isActive = false;
-        _isComplete = true;
+    // call
+    else {
+      if (curETHPrice > strikePriceUSD) {
+        Stages currentStage = Stages.inTheMoney;
         return true;
+      }
+      else {
+        Stages currentStage = Stages.outTheMoney;
+        return false;
+      }
     }
-
-    // If condition is not met on maturity, allow sender to reclaim from escrow
-    function recall() returns (bool val) {
-        if (!_isActive || _isComplete || isConditionMet()) {
-            return false;
-        }
-        _transaction.sender.send(this.balance);
-        // suicide(_transaction.sender);
-        _isActive = false;
-        _isComplete = true;
-        return true;
-    }
+    return false;
+  }
 
 
-    // ======= Log Events ========= //
 
-    _transaction = OneToOneTransaction(sender, receiver, msg.value);
+
+
+  // ======= Log Events ========= //
+
+  _transaction = LogTransferMade(sender, receiver, msg.value);
 
 
 }

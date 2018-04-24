@@ -1,6 +1,25 @@
-class Option {
-  constructor(maturity, ETHStrikePrice, ETHcurrent, optionPrice, user) {
-      this.maturity = maturity
+const fs = require('fs');
+const solc = require('solc');
+const web3 = require('web3');
+
+// Connected already, right?
+// const web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+
+
+class callOption {
+  constructor(maturityDate, ETHStrikePrice,
+    premiumPrice, optionCreatorAddress,
+    optionCreatorType, optionValue, offerExpiry) {
+    this.maturityDate = maturityDate;
+    this.ETHStrikePrice = ETHStrikePrice;
+    this.premiumPrice = premiumPrice
+    this.optionCreatorAddress = optionCreatorAddress;
+    this.optionCreatorType = optionCreatorType;
+    this.optionValue = optionValue;
+    // only allow fulfillemnt before certain datetime
+    this.offerExpiry = offerExpiry;
+
+
   }
   // // Getter
   // get area() {
@@ -25,6 +44,48 @@ class Option {
 // 6) update list of 'my options' tab
 
 
+
+$(document).ready(function() {
+
+  $("#createOptionOffer").click(function() {
+    maturityDate = $("maturity").text();
+    ETHStrikePrice = $("ETHStrikePrice").text();
+    premiumPrice = $("premiumPrice").text();
+    optionCreatorType = "buyer or seller";
+    optionCreatorAddress = "0x......";
+    offerExpiry = $("offerExpiry").text();
+    optionValue = $("numberETH").text();
+
+
+
+    console.log('writing to ipfs');
+
+    const curOption = new Option(maturityDate, ETHStrikePrice,
+       premiumPrice, optionCreatorAddress, optionCreatorType,
+      optionValue, offerExpiry)
+
+
+
+    sendToIPFS(curOption);
+  });
+
+});
+
+
+
+function instantiateOptionSmartContract(optionObj) {
+  // Compile the source code
+  const input = fs.readFileSync('Token.sol');
+  const output = solc.compile(input.toString(), 1);
+  const bytecode = output.contracts['Token'].bytecode;
+  const abi = JSON.parse(output.contracts['Token'].interface);
+
+}
+
+
+
+
+
 function sendToIPFS(payload) {
   $.ajax({
     type: "POST",
@@ -43,22 +104,3 @@ function sendToIPFS(payload) {
     }
   });
 }
-
-
-
-$(document).ready(function() {
-
-$("#optionOffer").click(function() {
-  // use jQueryc to get option params
-
-  maturity = "2019:01:01";
-  ETHStrikePrice = "$1000"
-  ETHcurrent = "$500";
-  optionPrice = "$10";
-  console.log('writing to ipfs');
-  const curOption = new Option(maturity, ETHStrikePrice, ETHcurrent, optionPrice, 'ricky')
-
-  sendToIPFS(curOption);
-});
-
-});
