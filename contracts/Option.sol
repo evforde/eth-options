@@ -5,193 +5,143 @@ pragma solidity ^0.4.0;
 
 
 contract Option {
+  uint constant public numberETH = 1000000000000000000; // in wei
 
-  address public optionBuyer; // address returned from TradingAccount.sol
+  address public optionBuyer;
   address public optionSeller;
-  uint public optionCreationTime;
-  bool public optionType; // put = True, call = False
-  bool public optionCreatorType; // optionBuyer = True, optionSeller = False
-  bool public traderType; // optionBuyer = True, optionSeller = False
-  uint public numberETH;
-  /* uint public optionFulfilledTime;TODO remove? */
-  uint public curETHPrice;
-  uint public strikePriceUSD;
-  uint public maturityDateTime;
-  uint public premiumAmount;
 
-  uint public contractBalance;
+  uint public optionCreationTime;  // what is this needed for?
+  bool public optionType;          // put = True, call = False.
+  // TODO(eforde): use enums for this?
+  bool public optionCreatorType;   // buyer = True, seller = False.
+
+  uint public strikePriceUSD;
+  uint public premiumAmount;
+  uint public cacellationTime;
+  uint public maturityTime;
 
 
   // Nuking enums to get stack depth under control? enum vs bool vs uint memory sizing?
   /* enum OptionType {call, put} */
-  enum Stages {outTheMoney, inTheMoney, unfulfilled, exercised}
+  // inactive -> creator can call cancel()
+  // inactive -> active
+  // active   -> buyer can call exercise() if not expired
+  // active   -> seller can call recalimFunds() if expired
+  enum State {inactive, active}
+
+  State public currentState;
 
   // events
 
   event LogTransferMade(address sender, address receiver, uint amount);
 
-  // constructor
-  function Option(
-    address optionCreatorAddress, bool optionCreatorType,
-    uint optionCreationTime, bool optionType, uint numberETH,
-    uint strikePriceUSD, uint maturityDateTime, uint premiumAmount) public {
 
-      require(msg.sender == optionCreatorAddress);
-      optionCreatorAddress = msg.sender;
-      optionCreatorType = optionCreatorType; //optionBuyer = True, optionSeller = False
-      optionType = optionType; // put = True, call = False
-      numberETH = numberETH; // option value
+  function Option(bool traderType, uint optionCreationTime,
+                  bool optionType, uint strikePriceUSD, 
+                  uint maturityTime, uint premiumAmount,
+                  uint cancellationTime) public {
+      require(optionType == False); // Only allow calls
+      optionCreatorType = traderType;
+      optionType = optionType;
       optionCreationTime = optionCreationTime;
       strikePriceUSD = strikePriceUSD;
-      maturityDateTime = maturityDateTime;
+      maturityTime = maturityTime;
       premiumAmount = premiumAmount;
-
-      contractBalance = address(this).balance;
+      cancellationTime = cancellationTime;
 
       // set optionBuyer/optionSeller based on optionCreatorType
-      if (optionCreatorType) {
-        optionBuyer = optionCreatorAddress;
+      if (traderType) {
+        optionBuyer = msg.sender;
       }
       else {
-        optionSeller = optionCreatorAddress;
+        optionSeller = msg.sender;
       }
-      Stages public currentStage = Stages.unfulfilled;
+      currentState = State.inactive;
   }
 
 
   // call after Option constructed!
-  function initialDeposit(uint amount, bool optionCreatorType) payable public {
-    // TODO wei vs ether
-    require(msg.value == amount);
-    // optionBuyer
-    if (optionCreatorType) {
+  // TODO(eforde): we should have the deposit be on construction if possible
+  function initialDeposit(bool optionCreatorType) payable public {
+    if (optionCreatorType) { // optionBuyer
       require(amount == premiumAmount);
-      return "success";
     }
-    else {
-      // optionSeller
+    else { // optionSeller
       require(amount == numberETH);
-      return "success";
     }
-    return "failure";
-
   }
 
-  function attemptFulfillment(address tradingAccountAddress, bool traderType, uint amount, uint curETHPrice) payable public returns (bool) {
-    if (currentStage == Stages.unfulfilled) {
-      fulfillOption(tradingAccountAddress, traderType, amount, curETHPrice);
-      return true;
+
+  function activateContract(address addr, bool traderType) payable public{
+    require(currentState == States.inactive);
+    require(traderType == !optionCreatorType);
+    require(block.timestamp < cancellationTime); // TODO(eforde): otherwise cancel
+    if (traderType) { // buyer
+      require(addr(this).balance == numberETH);
+      require(msg.amount == premiumAmount);
+      require(optionSeller != 0);
+      optionBuyer = msg.sender;
     }
-    return false;
+    else { // seller
+      require(addr(this).balance == premiumAmount);
+      require(msg.amount == numberETH);
+      require(optionBuyer != 0);
+      optionSeller = msg.sender;
+    }
+    currentState = State.active;
+    optionSeller.transfer(premiumAmount);
+    // TODO(eforde): verify not susceptible to reentry
   }
 
-  function fulfillOption(address tradingAccountAddress, bool traderType, uint curETHPrice) payable private {
-    // TODO wei vs ether
-    require(msg.value == amount);
-    curETHPrice = curETHPrice;
 
-    if (traderType) {
-      require(amount == premiumAmount);
-      optionBuyer = tradingAccountAddress;
-    }
-    else {
-      require(amount == numberETH);
-      optionSeller = tradingAccountAddress;
-    }
-    // option fulfilled !
-    Stages currentStage = Stages.outTheMoney;
-
-    // transfer premiumAmount to optionSeller
-    optionSeller.transfer(uint premiumAmount);
-  }
-
-  function exerciseOption(uint currentETHPrice, uint datetime) public returns (bool) {
-
-    require(datetime < maturityDateTime);
-
+  function exercise(uint currentETHPrice) public returns (bool) {
     require(msg.sender == optionBuyer);
-    // TODO figure out put
-    if (optionType) {
-      return false;
-    }
-    // call
-    else {
-      if (inTheMoney(currentETHPrice)) {
-        //less gass
-        require(numberETH == address(this).balance); //should be equal!
-        suicide(optionBuyer);
-        /* optionBuyer.transfer(numberETH); */
-        Stages currentStage = Stages.exercised;
-        return true;
-      }
-      else {
-        return false;
-      }
-    }
+    require(block.timestamp < maturityTime); // TODO(eforde): otherwise expire
+    require(optionType == false); // TODO figure out put
+    require(inTheMoney(currentETHPrice));
+
+    // less gass
+    require(numberETH <= address(this).balance); // should be equal!
+    
+    // TODO(eforde): be careful about reentry here
+
+    // suicide(optionBuyer);
+    // optionBuyer.transfer(numberETH);
+
+    // We don't want to send all funds to the buyer... just the difference
+    // between (strikePrice - currentEthPrice) * eth_amount, and then the
+    // rest should go to seller
+    // TODO(eforde): transfer and kill contract
   }
 
 
-
-  function deleteOption(address tradingAccountAddress) public returns (bool) {
-    if (currentStage = Stages.unfulfilled) {
-      if (tradingAccountAddress == optionCreatorAddress) {
-        // suicide less gas!
-        suicide(tradingAccountAddress);
-        /* tradingAccountAddress.transfer(address(this).balance); */
-      }
-    }
-
-    else {
-      return false;
-    }
+  function cancel(address tradingAccountAddress) public returns (bool) {
+    require(currentState == States.inactive);
+    require(msg.sender == optionCreatorAddress);
+    suicide(msg.sender);
   }
 
+
+  function reclaimFunds(address tradingAccountAddress) public returns (bool) {
+    require(currentState == States.active);
+    require(msg.sender == optionSeller);
+    require(block.timestamp > maturityTime);
+    suicide(msg.sender);
+  }
 
 
   // ===== Utility functions ===== //
 
-  function checkPlayerExists(address tradingAccountAddress) private returns (bool) {
-    if (tradingAccountAddress == optionBuyer) || (tradingAccountAddress == optionSeller) {
-      return true;
-    }
-    else {
-      return false;
-    }
-  }
-
-
-
-  /* Stages public currentStage = Stages.outTheMoney; */
 
   function inTheMoney(uint curETHPrice) private returns (bool) {
-    // put
-    if (optionType) {
-      if (curETHPrice < strikePriceUSD) {
-        Stages currentStage = Stages.inTheMoney;
-        return true;
-      }
-      else {
-        Stages currentStage = Stages.outTheMoney;
-        return false;
-      }
-    }
-    // call
-    else {
-      if (curETHPrice > strikePriceUSD) {
-        Stages currentStage = Stages.inTheMoney;
-        return true;
-      }
-      else {
-        Stages currentStage = Stages.outTheMoney;
-        return false;
-      }
-    }
-    return false;
+    // TODO(eforde): verify price is correct, or fetch price from on-chain
+    // fiat contract
+    return (optionType && (curEthPrice < strikePriceUSD)) || // put
+           (!optionType && (curEthPrice > strikePriceUSD));  // call
   }
+
 
   // ======= Log Events ========= //
 
   _transaction = LogTransferMade(sender, receiver, msg.value);
-
-
 }
