@@ -18,18 +18,15 @@ contract Option {
   uint public cancellationTime;
   uint public maturityTime;
 
+  // inactive -> creator can call cancel()
+  // inactive -> active
+  // active   -> buyer can call exercise() if not expired
+  // active   -> seller can call recalimFunds() if expired
   bool public isActive;
 
   // BIG TODO(eforde): block.timestamp not secure...
   // BIG TODO(eforde): block.timestamp not secure...
   // BIG TODO(eforde): block.timestamp not secure...
-
-  // Nuking enums to get stack depth under control? enum vs bool vs uint memory sizing?
-  /* enum OptionType {call, put} */
-  // inactive -> creator can call cancel()
-  // inactive -> active
-  // active   -> buyer can call exercise() if not expired
-  // active   -> seller can call recalimFunds() if expired
 
   // events
 
