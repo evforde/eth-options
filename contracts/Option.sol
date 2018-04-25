@@ -15,7 +15,7 @@ contract Option {
 
   uint public strikePriceUSD;
   uint public premiumAmount;
-  uint public cacellationTime;
+  uint public cancellationTime;
   uint public maturityTime;
 
   bool public isActive;
@@ -36,13 +36,13 @@ contract Option {
   event LogTransferMade(address sender, address receiver, uint amount);
 
 
-  function Option(bool optionType, uint strikePriceUSD, 
-                  uint maturityTime, uint cancellationTime,
-                  uint premiumAmount, bool traderType) public payable {
-      require(optionType == False); // Only allow calls
+  constructor(bool _optionType, uint _strikePriceUSD,
+              uint _maturityTime, uint _cancellationTime,
+              uint _premiumAmount, bool _traderType) public payable {
+      require(_optionType == false); // Only allow calls
 
       // set optionBuyer/optionSeller based on optionCreatorType
-      if (traderType) {
+      if (_traderType) {
         require(msg.value == premiumAmount);
         optionBuyer = msg.sender;
       }
@@ -51,29 +51,29 @@ contract Option {
         optionSeller = msg.sender;
       }
 
-      optionCreatorType = traderType;
-      optionType = optionType;
-      strikePriceUSD = strikePriceUSD;
-      maturityTime = maturityTime;
-      premiumAmount = premiumAmount;
-      cancellationTime = cancellationTime;
+      optionCreatorType = _traderType;
+      optionType = _optionType;
+      strikePriceUSD = _strikePriceUSD;
+      maturityTime = _maturityTime;
+      premiumAmount = _premiumAmount;
+      cancellationTime = _cancellationTime;
 
       isActive = false;
   }
 
-  function activateContract(address addr, bool traderType) payable public{
+  function activateContract(bool traderType) payable public{
     require(!isActive);
     require(traderType == !optionCreatorType);
     require(block.timestamp < cancellationTime); // TODO(eforde): otherwise cancel
     if (traderType) { // buyer
-      require(addr(this).balance == underlyingAmount);
-      require(msg.amount == premiumAmount);
+      require(address(this).balance == underlyingAmount);
+      require(msg.value == premiumAmount);
       require(optionSeller != 0);
       optionBuyer = msg.sender;
     }
     else { // seller
-      require(addr(this).balance == premiumAmount);
-      require(msg.amount == underlyingAmount);
+      require(address(this).balance == premiumAmount);
+      require(msg.value == underlyingAmount);
       require(optionBuyer != 0);
       optionSeller = msg.sender;
     }
@@ -83,7 +83,7 @@ contract Option {
   }
 
 
-  function exercise(uint currentETHPrice) public returns (bool) {
+  function exercise(uint currentETHPrice) public {
     require(msg.sender == optionBuyer);
     require(block.timestamp < maturityTime); // TODO(eforde): otherwise expire
     require(optionType == false); // TODO figure out put
@@ -103,25 +103,27 @@ contract Option {
   }
 
 
-  function cancel() public returns (bool) {
+  function cancel() public {
     require(!isActive);
-    require(msg.sender == optionCreatorAddress);
-    suicide(msg.sender);
+    // Assert sender created the contract
+    require((optionCreatorType && (msg.sender == optionBuyer)) ||
+            (!optionCreatorType && (msg.sender == optionSeller)));
+    selfdestruct(msg.sender);
   }
 
 
-  function reclaimFunds() public returns (bool) {
+  function reclaimFunds() public {
     require(isActive);
     require(msg.sender == optionSeller);
     require(block.timestamp > maturityTime);
-    suicide(msg.sender);
+    selfdestruct(msg.sender);
   }
 
 
   // ===== Utility functions ===== //
 
 
-  function inTheMoney(uint curETHPrice) private returns (bool) {
+  function inTheMoney(uint curEthPrice) private view returns (bool) {
     // TODO(eforde): verify price is correct, or fetch price from on-chain
     // fiat contract
     return (optionType && (curEthPrice < strikePriceUSD)) || // put
@@ -131,5 +133,6 @@ contract Option {
 
   // ======= Log Events ========= //
 
-  _transaction = LogTransferMade(sender, receiver, msg.value);
+  // TODO(eforde):
+  // _transaction = LogTransferMade(sender, receiver, msg.value);
 }
