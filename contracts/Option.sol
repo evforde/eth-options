@@ -66,11 +66,14 @@ contract Option {
     // optionBuyer
     if (optionCreatorType) {
       require(amount == premiumAmount);
+      return "success";
     }
     else {
       // optionSeller
       require(amount == numberETH);
+      return "success";
     }
+    return "failure";
 
   }
 

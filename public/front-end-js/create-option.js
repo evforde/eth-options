@@ -32,24 +32,6 @@ class callOption {
   }
 }
 
-
-// ---------WORKFLOW FOR CREATING OPTION --------
-//
-// 1) WHEN CREATE BUTTON PRESSED LISTEN
-//
-// 2) CREATE OPTION CONTRACT (have unfulfilled status) (get smart contract address and save)
-//
-// 3) send ETH (either premium or the collateral to smart contract)
-// web3.eth.sendTransaction({from: acct1, to:acct2, value: web3.toWei(1, 'ether'), gasLimit: 21000, gasPrice: 20000000000})
-//
-// 4) upload the optin to ipfs
-//
-// 5) update list of unfulfilled options
-//
-// 6) update list of 'my options' tab
-
-
-
 $(document).ready(function() {
 
   $("#createOptionOffer").click(function() {
@@ -71,10 +53,12 @@ $(document).ready(function() {
 
 
     const smartContractInstance = optionSmartContractOperation(curOption);
-
-
     sendToIPFS(curOption);
-
+    // 4) upload the optin to ipfs
+    //
+    // 5) update list of unfulfilled options
+    //
+    // 6) update list of 'my options' tab
     // update list of unfulfilled options
 
     //update my options tab
@@ -87,56 +71,51 @@ class optionSmartContractOperation {
 
   constructor(optionObj) {
     this.optionObj = optionObj;
-    smartContractAddress = instantiateOptionSmartContract(optionObj);
+    smartContractAddress, optionSmartContractInstance = instantiateOptionSmartContract(optionObj);
+    despositFunds(smartContractAddress, optionObj, optionSmartContractInstance);
+  }
 
+  function despositFunds(smartContractAddress, optionObj, optionSmartContractInstance) {
     if (!smartContractAddress) {
       console.log("ERROR DEPLOYING Contract");
     }
     else {
       // desposit funds
       if (optionObj.optionCreatorType == "holder") {
+        const premiumWei = web3.toWei(premiumPrice, 'ether');
         const transactionObj = {from: optionObj.optionCreatorAddress,
-          to:smartContractAddress, value: web3.toWei(premiumPrice, 'ether'),
+          to:smartContractAddress, value: premiumWei,
           gas: 21000, gasPrice: 20000000000}
-        web3.eth.sendTransaction(transactionObj, (err, result) => {
-          if (!err) {
-            console.log(JSON.stringify(result));
-          }
-          else {
-            console.error(err);
+          // true is option buyer / holder
+        optionSmartContractInstance.initialDeposit(premiumWei, true, transactionObj, (res) => {
+          if (res == "failure") {
+            console.log("FAILURE to Desposit Funds. Abort!");
           }
         });
-
       }
-
-
       if (optionObj.optionCreatorType == "writer") {
-
-
-
-
-
-
-
-
-
+        const collateralWei = web3.toWei(numberETH, 'ether');
+        const transactionObj = {from: optionObj.optionCreatorAddress,
+          to:smartContractAddress, value: collateralWei,
+          gas: 21000, gasPrice: 20000000000}
+          // true is option buyer / holder
+        optionSmartContractInstance.initialDeposit(collateralWei, true, transactionObj, (res) => {
+          if (res == "failure") {
+            console.log("FAILURE to Desposit Funds. Abort!");
+          }
+        });
       }
-
-
-
-
+      else {
+        console.error("SHOULD only be writer or holder!");
+      }
     }
-
-  }
-
-  function desposit() {
-
   }
 
 
-  //TODO add myContract.options.address = '0x1234..' (address of smart contract)
 
   function instantiateOptionSmartContract(optionObj) {
+
+  //TODO in case this doesn't work https://github.com/ethereum/wiki/wiki/JavaScript-API#web3ethsendtransaction
     const smartContractAddress;
     // Compile the source code
     const input = fs.readFileSync('Option.sol');
@@ -174,14 +153,15 @@ class optionSmartContractOperation {
       }
       console.log("Error Deploying Contract!")
     });
-    return smartContractAddress;
+    return smartContractAddress, optionSmartContractInstance;
 
   }
 
 
-  function addSmartContractAddress(optionObj, address, optionSmartContract) {
+  function addSmartContractAddress(optionObj, smartContractAddress, optionSmartContract) {
     // add address of smart contract
-    const deployedContract = optionSmartContract.at(address);
+    // const deployedContract = optionSmartContract.at(address);
+    optionSmartContract.options.address = smartContractAddress
     // if options are mutable...
     optionObj.setSmartContractAddress(address);
   }
