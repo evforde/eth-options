@@ -16,7 +16,7 @@ contract Option {
   /* uint public optionFulfilledTime;TODO remove? */
   uint public curETHPrice;
   uint public strikePriceUSD;
-  uint public maturityDate;
+  uint public maturityDateTime;
   uint public premiumAmount;
 
   uint public contractBalance;
@@ -34,7 +34,7 @@ contract Option {
   function Option(
     address optionCreatorAddress, bool optionCreatorType,
     uint optionCreationTime, bool optionType, uint numberETH,
-    uint strikePriceUSD, uint maturityDate, uint premiumAmount) public {
+    uint strikePriceUSD, uint maturityDateTime, uint premiumAmount) public {
 
       require(msg.sender == optionCreatorAddress);
       optionCreatorAddress = msg.sender;
@@ -43,7 +43,7 @@ contract Option {
       numberETH = numberETH; // option value
       optionCreationTime = optionCreationTime;
       strikePriceUSD = strikePriceUSD;
-      maturityDate = maturityDate;
+      maturityDateTime = maturityDateTime;
       premiumAmount = premiumAmount;
 
       contractBalance = address(this).balance;
@@ -105,7 +105,9 @@ contract Option {
     optionSeller.transfer(uint premiumAmount);
   }
 
-  function exerciseOption(uint currentETHPrice) public returns (bool) {
+  function exerciseOption(uint currentETHPrice, uint datetime) public returns (bool) {
+
+    require(datetime < maturityDateTime);
 
     require(msg.sender == optionBuyer);
     // TODO figure out put
@@ -186,10 +188,6 @@ contract Option {
     }
     return false;
   }
-
-
-
-
 
   // ======= Log Events ========= //
 
