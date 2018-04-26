@@ -80,14 +80,14 @@ contract Option {
   }
 
 
-  function exercise(uint currentETHPrice) public {
+  function exercise(uint currentETHPrice) view public {
     require(msg.sender == optionBuyer);
     require(block.timestamp < maturityTime); // TODO(eforde): otherwise expire
     require(optionType == false); // TODO figure out put
     require(inTheMoney(currentETHPrice));
 
     require(underlyingAmount <= address(this).balance); // should be equal!
-    
+
     // TODO(eforde): be careful about reentry here
 
     // suicide(optionBuyer);
