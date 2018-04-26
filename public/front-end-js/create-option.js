@@ -47,7 +47,7 @@ $(document).ready(function() {
     $.ajax({
       type: "POST",
       url: "/api/deployOptionSmartContract",
-      data: curOption,
+      curOption: curOption,
       async: true,
       error: (err) => {
         console.log(err, "error from deployOptionSmartContract post");
