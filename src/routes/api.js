@@ -24,7 +24,8 @@ router.get("/getFromIPFS", function(req, res) {
 router.post("/deployOptionSmartContract", function(req, res) {
 
 
-  optionSmartContractOperations(req.body)
+  optionSmartContractOperations(req.body);
+  // res.status(200).send({});
 
 
 
