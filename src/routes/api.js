@@ -23,8 +23,10 @@ router.get("/getFromIPFS", function(req, res) {
 
 router.post("/deployOptionSmartContract", function(req, res) {
 
-  optionSmartContractOperations(req.body.curOption);
-  // res.status(200).send({});
+
+  optionSmartContractOperations(req.body)
+
+
 
 });
 
