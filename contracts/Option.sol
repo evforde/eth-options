@@ -81,6 +81,11 @@ contract Option {
 
 
   function exercise(uint currentETHPrice) view public {
+    // TODO(magendanz) discuss inability to decentralize because we are cheap (no oracle),
+    // and there is only one USD-ETH contract API on the blockchain and we don't want to
+    // create a dependency (FiatContract)
+    // TODO(magendanz) do we want some sort of cryptographic authentication that the server 
+    // is the only one making this function call?
     require(msg.sender == optionBuyer);
     require(block.timestamp < maturityTime); // TODO(eforde): otherwise expire
     require(optionType == false); // TODO figure out put
