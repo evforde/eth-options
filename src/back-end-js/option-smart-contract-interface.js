@@ -20,12 +20,14 @@ class optionSmartContractOperations {
     }
 
     else {
+      const maxGasProvided = 40000; //min txn is 21000
+      const weiPerGas = 30000000000; // or 20000000000
       // desposit funds
       if (optionObj.optionCreatorType == "holder") {
         const premiumWei = web3.toWei(premiumPrice, 'ether');
         const transactionObj = {from: optionObj.optionCreatorAddress,
           to:smartContractAddress, value: premiumWei,
-          gas: 21000, gasPrice: 20000000000}
+          gas: maxGasProvided, gasPrice: weiPerGas}
           // true is option buyer / holder
         optionSmartContractInstance.initialDeposit(premiumWei, true, transactionObj, (res) => {
           if (res == "failure") {
@@ -37,7 +39,7 @@ class optionSmartContractOperations {
         const collateralWei = web3.toWei(numberETH, 'ether');
         const transactionObj = {from: optionObj.optionCreatorAddress,
           to:smartContractAddress, value: collateralWei,
-          gas: 21000, gasPrice: 20000000000}
+          gas: maxGasProvided, gasPrice: weiPerGas}
           // true is option buyer / holder
         optionSmartContractInstance.initialDeposit(collateralWei, true, transactionObj, (res) => {
           if (res == "failure") {

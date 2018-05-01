@@ -1,9 +1,5 @@
 pragma solidity ^0.4.0;
 
-//kill ? (can it ever be killed by someone)
-// TODO keep track of balance?
-
-
 contract Option {
   uint constant public underlyingAmount = 1000000000000000000; // 1 eth in wei
 
@@ -84,24 +80,26 @@ contract Option {
     // TODO(magendanz) discuss inability to decentralize because we are cheap (no oracle),
     // and there is only one USD-ETH contract API on the blockchain and we don't want to
     // create a dependency (FiatContract)
-    // TODO(magendanz) do we want some sort of cryptographic authentication that the server 
+    // TODO(magendanz) do we want some sort of cryptographic authentication that the server
     // is the only one making this function call?
     require(msg.sender == optionBuyer);
     require(block.timestamp < maturityTime); // TODO(eforde): otherwise expire
-    require(optionType == false); // TODO figure out put
+    require(optionType == false);
     require(inTheMoney(currentETHPrice));
 
     require(underlyingAmount <= address(this).balance); // should be equal!
 
     // TODO(eforde): be careful about reentry here
 
-    // suicide(optionBuyer);
-    // optionBuyer.transfer(underlyingAmount);
+    //TODO(moezinia) send underlyingAmount*(currentETHPrice-strikePrice) to optionBuyer in WEI
+    holderSettlementAmout = ((currentETHPrice - strikePriceUSD)/currentETHPrice) * underlyingAmount;
+    optionBuyer.transfer(buyerSettlementAmout);
+    //TODO(moezinia) send rest to seller (is amount of ether equivalent to strike price..) in WEI
+    writerSettlementAmount = (strikePriceUSD/currentETHPrice) * underlyingAmount;
+    require(writerSettlementAmount == address(this).balance);
+    suicide(optionSeller); // less gass
 
-    // We don't want to send all funds to the buyer... just the difference
-    // between (strikePrice - currentEthPrice) * eth_amount, and then the
-    // rest should go to seller
-    // TODO(eforde): transfer and kill contract
+    // TODO(eforde: kill contract
   }
 
 
