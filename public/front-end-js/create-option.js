@@ -10,6 +10,7 @@ class callOption {
     this.optionValue = optionValue;
     // only allow fulfillemnt before certain datetime
     this.offerExpiry = offerExpiry;
+    this.optionType = false; //call option...
   }
 
   set setSmartContractAddress(address) {
@@ -29,47 +30,54 @@ $(document).ready(function() {
     ETHStrikePrice = $("ETHStrikePrice").text();
     premiumPrice = $("premiumPrice").text();
     optionCreatorType = "writer";//or holder TODO how to do this nicely in UI - create bid /create ask>?
-    // get tradingAccountAddress for this metamask user address!
-    optionCreatorAddress = web3.eth.contracts[0] //TODO correct? from metamask...
-
-
     offerExpiry = $("offerExpiry").text();
     optionValue = $("numberETH").text();
 
+    // get tradingAccountAddress for this metamask user address!
+    // optionCreatorAddress = web3.eth.contracts[0] //TODO correct? from metamask...
 
 
-
-    const curOption = new Option(maturityDate, ETHStrikePrice,
-       premiumPrice, optionCreatorAddress, optionCreatorType,
-      optionValue, offerExpiry);
+    getMetamaskAccount(function(optionCreatorAddress) {
 
 
-    $.ajax({
-      type: "POST",
-      url: "/api/deployOptionSmartContract",
-      curOption: curOption,
-      async: true,
-      error: (err) => {
-        console.log(err, "error from deployOptionSmartContract post");
-        return err;
-      },
-      success: (res) => {
-        console.log("result from deployOptionSmartContract post is", res);
+      const curOption = new callOption(maturityDate, ETHStrikePrice,
+         premiumPrice, optionCreatorAddress, optionCreatorType,
+        optionValue, offerExpiry);
 
-        console.log('writing to ipfs');
-        sendToIPFS(curOption);
-        // 4) upload the optin to ipfs
-        //
-        // 5) update list of unfulfilled options
-        //
-        // 6) update list of 'my options' tab
-        // update list of unfulfilled options
+      $.ajax({
+        type: "POST",
+        url: "/api/deployOptionSmartContract",
+        data: curOption,
+        dataType: "json",
+        async: true,
+        error: (err) => {
+          console.log(err, "error from deployOptionSmartContract post");
+          // alert("ERROR deploying smart contract");
+          return err;
+        },
+        success: (res) => {
+          console.log("result from deployOptionSmartContract post is", res);
 
-        //update my options tab
-        return res;
-      }
+          console.log('writing to ipfs');
+          sendToIPFS(curOption);
+
+          //TODO(moezinia) NEED to return the smartContractAddress in response from deploying contracts
+          // set setSmartContractAddress is set in back end
+
+          // 4) upload the optin to ipfs
+          //
+          // 5) update list of unfulfilled options
+          //
+          // 6) update list of 'my options' tab
+          // update list of unfulfilled options
+
+          //update my options tab
+          return res;
+        }
+      });
+
+
     });
-
 
   });
 

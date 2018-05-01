@@ -29,29 +29,28 @@ contract Option {
   event LogTransferMade(address sender, address receiver, uint amount);
 
 
-  constructor(bool _optionType, uint _strikePriceUSD,
-              uint _maturityTime, uint _cancellationTime,
-              uint _premiumAmount, bool _traderType) public payable {
-      require(_optionType == false); // Only allow calls
+  function Option(bool _optionType, uint _strikePriceUSD,
+    uint _maturityTime, uint _cancellationTime,
+    uint _premiumAmount, bool _traderType) public payable {
+    require(_optionType == false); // Only allow calls
+    // set optionBuyer/optionSeller based on optionCreatorType
+    if (_traderType) {
+      require(msg.value == premiumAmount);
+      optionBuyer = msg.sender;
+    }
+    else {
+      require(msg.value == underlyingAmount);
+      optionSeller = msg.sender;
+    }
 
-      // set optionBuyer/optionSeller based on optionCreatorType
-      if (_traderType) {
-        require(msg.value == premiumAmount);
-        optionBuyer = msg.sender;
-      }
-      else {
-        require(msg.value == underlyingAmount);
-        optionSeller = msg.sender;
-      }
+    optionCreatorType = _traderType;
+    optionType = _optionType;
+    strikePriceUSD = _strikePriceUSD;
+    maturityTime = _maturityTime;
+    premiumAmount = _premiumAmount;
+    cancellationTime = _cancellationTime;
 
-      optionCreatorType = _traderType;
-      optionType = _optionType;
-      strikePriceUSD = _strikePriceUSD;
-      maturityTime = _maturityTime;
-      premiumAmount = _premiumAmount;
-      cancellationTime = _cancellationTime;
-
-      isActive = false;
+    isActive = false;
   }
 
   function activateContract(bool traderType) payable public{
@@ -76,7 +75,7 @@ contract Option {
   }
 
 
-  function exercise(uint currentETHPrice) view public {
+  function exercise(uint currentETHPrice) public {
     // TODO(magendanz) discuss inability to decentralize because we are cheap (no oracle),
     // and there is only one USD-ETH contract API on the blockchain and we don't want to
     // create a dependency (FiatContract)
@@ -92,12 +91,12 @@ contract Option {
     // TODO(eforde): be careful about reentry here
 
     //TODO(moezinia) send underlyingAmount*(currentETHPrice-strikePrice) to optionBuyer in WEI
-    holderSettlementAmout = ((currentETHPrice - strikePriceUSD)/currentETHPrice) * underlyingAmount;
-    optionBuyer.transfer(buyerSettlementAmout);
+    uint holderSettlementAmout = ((currentETHPrice - strikePriceUSD)/currentETHPrice) * underlyingAmount;
+    optionBuyer.transfer(holderSettlementAmout);
     //TODO(moezinia) send rest to seller (is amount of ether equivalent to strike price..) in WEI
-    writerSettlementAmount = (strikePriceUSD/currentETHPrice) * underlyingAmount;
+    uint writerSettlementAmount = (strikePriceUSD/currentETHPrice) * underlyingAmount;
     require(writerSettlementAmount == address(this).balance);
-    suicide(optionSeller); // less gass
+    selfdestruct(optionSeller); // less gass
 
     // TODO(eforde: kill contract
   }

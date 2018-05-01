@@ -22,12 +22,14 @@ router.get("/getFromIPFS", function(req, res) {
 
 
 router.post("/deployOptionSmartContract", function(req, res) {
-
-
-  optionSmartContractOperations(req.body);
-  // res.status(200).send({});
-
-
+  // console.log(req);
+  const optionObj = req.body;
+  const smartContractAddress = "";
+  console.log(optionObj, " API hit for deploying smart contract for option")
+  newContract = new optionSmartContract.optionSmartContractOperations(optionObj);
+  smartContractAddress, optionSmartContractInstance = newContract.instantiateOptionSmartContract(optionObj);
+  // newContract.despositFunds(smartContractAddress, optionObj, optionSmartContractInstance);
+  // res.status(200).send({smartContractAddress: smartContractAddress});
 
 });
 
