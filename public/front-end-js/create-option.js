@@ -45,11 +45,9 @@ $(document).ready(function() {
       // instantiateOptionSmartContract
       const interfaceInstance = new optionSmartContractInterface(curOption);
       // smartContractAddress, optionSmartContractInstance = interfaceInstance.instantiateOptionSmartContract(optionObj);
-      interfaceInstance.instantiateOptionSmartContract(curOption);
-      // interfaceInstance.despositFunds(smartContractAddress, curOption, optionSmartContractInstance);
-
-      //TODO(moezinia) NEED to return the smartContractAddress in response from deploying contracts
-      // save to curOption, so can access later for fulfillemntj
+      smartContractAddress = interfaceInstance.instantiateOptionSmartContract(curOption);
+      // interfaceInstance.despositFunds(smartContractAddress, curOption);
+      curOption.setSmartContractAddress(smartContractAddress);
 
       // 4) upload the optin to ipfs
       sendToIPFS(curOption);
@@ -83,7 +81,7 @@ function sendToIPFS(payload) {
       return err;
     },
     success: function(res) {
-      console.log("result from post is", res);
+      // console.log("result from post is", res);
       return res;
     }
   });

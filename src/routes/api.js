@@ -31,6 +31,7 @@ router.get("/getFromIPFS", function(req, res) {
 router.post("/appendToIPFS", function(req, res) {
   // console.log('body to here', req.body);
   const result = IPFS.sendToIPFS(req.body);
+  //TODO(moezinia) sent something more useful...
   res.send({ response: result });
 });
 
