@@ -6,7 +6,7 @@ class optionSmartContractInterface {
   constructor(_optionObj) {
     this.optionObj = _optionObj;
     //TODO(moezinia) optimize gas and price..
-    this.maxGasProvided = 400000; //gas limit max 4665264   860444 used for create/deposit!
+    this.maxGasProvided = 1000000; //gas limit max 4665264   860444 used for create/deposit!
     this.gasPrice = "20000000000"; // 20 Gwei (next few blocks ~ few seconds)
   }
 

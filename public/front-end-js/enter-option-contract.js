@@ -1,31 +1,67 @@
-//------ Workflow- On Listed Options page
-//
-// 1) button listener when pressed fulfill
-//
-// 2) get buyer/seller status and trading account address
-//
-// 3) verify bytecode of both trading accounts (using web3 https://web3js.readthedocs.io/en/1.0/web3-eth-contract.html)
-//
-// 4) TradingAccount address is going to have to send to SC (web3.sendTransaction (either depsoti collateral or the premium))
-//
-// 5) make sure that order has not already been fulfilled (call buyOption/sellOption on SC)
-//
+$(document).ready(function() {
+  // # id . class
+  $(".acceptOptionOffer").click(function() {
+
+    optionObj = $("optionObject"); // use ejs (res.render(optionObj) var client side)
+
+    contractAddress = optionObj.contractAddress;
+    optionFulfillerType = !optionObj.optionCreatorType;
+
+
+    //TODO remove, just for testing
+    premiumPrice = 0.1;
+    offerExpiry = 100;
+    ETHStrikePrice = 2;
+    maturityDate = 100;
+    //TODO
+
+    // TODO unless use tradingaccount ?
+    getMetamaskAccount(function(optionFulfillerAddress) {
+      const maxGasProvided = 1000000; //gas limit max 4665264   860444 used for create/deposit!
+      const gasPrice = "20000000000"; // 20 Gwei (next few blocks ~ few seconds)
+
+      // true is holder/buyer, false writer
+      if (optionFulfillerType) {
+        const valueToSend = web3.toWei(this.optionObj.premiumPrice, 'ether');
+      }
+      else {
+        const valueToSend = this.optionObj.underlyingAmount; // already in wei
+      }
+
+
+      // const optionContract = web3.eth.contract(OptionContractABI);
+      const optionContract = web3.eth.contract(OptionContractABI, null, fallbackValues);
+      const optionSmartContract = web3.eth.contract.at(optionObj.smartContractAddress);
+
+      const transactionObj = {
+        // data: bytecode,
+        data: OptionContractBinary,
+        from: this.optionObj.optionFulfillerAddress,
+        gas: maxGasProvided,
+        gasPrice: gasPrice,
+        value: valueToSend
+      }
+
+      optionSmartContract.activateContract(optionFulfillerType, true, transactionObj, (res) => {
+        if (res == "failure") {
+          console.log("FAILURE to Desposit Funds. Abort!");
+        }
+      });
+
+      // could return success of method call.
+      optionObj.active = true;
+
+
+      
+      //TODO(moezinia) change it to active on IPFS somehow...
+      // sendToIPFS(curOption);
+
+      // call update-order-book
+      // call update - user specific tingz ' my options'
+      //update my options tab
 
 
 
-// Workflow Exercising option
-
-// 1) convert time now to datetime uint for option method exercise........
-//
-// 2) ask for update conversion rate
-
-
-
-
-// Workflow Deleting an Option
-
-// 1) need to retrieve ETH from smart contract
-//
-// 2) delete from IPFS
-//
-// 3) update listed unfulfilled options
+    });
+  });
+});

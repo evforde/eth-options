@@ -11,6 +11,7 @@ class callOption {
     // only allow fulfillemnt before certain datetime
     this.offerExpiry = offerExpiry;
     this.optionType = false; //call option...
+    this.active = false;
   }
 
   setSmartContractAddress(address) {

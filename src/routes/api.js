@@ -14,20 +14,6 @@ router.get("/getFromIPFS", function(req, res) {
   res.send(data);
 });
 
-
-// POSTs
-// dont in front end
-// router.post("/deployOptionSmartContract", function(req, res) {
-//   // console.log(req);
-//   const optionObj = req.body;
-//   const smartContractAddress = "";
-//   console.log(optionObj, " API hit for deploying smart contract for option")
-//   newContract = new optionSmartContract.optionSmartContractOperations(optionObj);
-//   smartContractAddress, optionSmartContractInstance = newContract.instantiateOptionSmartContract(optionObj);
-//   // newContract.despositFunds(smartContractAddress, optionObj, optionSmartContractInstance);
-//   // res.status(200).send({smartContractAddress: smartContractAddress});
-// });
-
 router.post("/appendToIPFS", function(req, res) {
   // console.log('body to here', req.body);
   const result = IPFS.sendToIPFS(req.body);
