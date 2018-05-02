@@ -1,27 +1,13 @@
-const fs = require('fs');
-const solc = require('solc');
-// var web3;
-var Web3 = require('web3');
-var web3 = new Web3();
-// // var web3 = new Web3(web3.currentProvider);
-// // web3.setProvider(new web3.providers.HttpProvider());
-// // web3.setProvider(new web3.providers.HttpProvider('http://localhost:8545'));
-web3.setProvider(new web3.providers.HttpProvider("http://localhost:7545"))
+// const fs = require('fs');
+// const solc = require('solc');
 
-
-
-
-
-
-class optionSmartContractOperations {
+class optionSmartContractInterface {
 
   constructor(_optionObj) {
     this.optionObj = _optionObj;
-
   }
 
-  instantiateOptionSmartContract(optionObj) {
-    //TODO in case this doesn't work https://github.com/ethereum/wiki/wiki/JavaScript-API#web3ethsendtransaction
+  instantiateOptionSmartContract() {
     // Compile the source code
     const input = fs.readFileSync('./contracts/Option.sol', 'utf8');
     const output = solc.compile(input, 1);
@@ -30,10 +16,9 @@ class optionSmartContractOperations {
     // abi is jsoninterface https://web3js.readthedocs.io/en/1.0/glossary.html#glossary-json-interface
     const abi = JSON.parse(output.contracts[':Option'].interface);
 
-
     const fallbackValues = {
       data: bytecode,
-      from: optionObj.optionCreatorAddress,
+      from: this.optionObj.optionCreatorAddress,
       gas: 90000*2,
       gasPrice: '20000000000'
     }
@@ -41,9 +26,9 @@ class optionSmartContractOperations {
     const optionSmartContract = new web3.eth.Contract(abi, null, fallbackValues);
     optionSmartContract.deploy({
       data: bytecode,
-      arguments: [optionObj.type, optionObj.ETHStrikePrice,
-      optionObj.maturityDate, optionObj.offerExpiry,
-      optionObj.premiumPrice, optionObj.optionCreatorType]
+      arguments: [this.optionObj.type, this.optionObj.ETHStrikePrice,
+      this.optionObj.maturityDate, this.optionObj.offerExpiry,
+      this.optionObj.premiumPrice, this.optionObj.optionCreatorType]
     })
     .send(fallbackValues, (err, txnHash) => {console.log(err, txnHash)})
     .on("error", (err) => {console.log("ERR", err)})
@@ -98,15 +83,9 @@ class optionSmartContractOperations {
   }
 }
 
-
-
-
   addSmartContractAddress(smartContractAddress, optionSmartContract) {
     // add address of smart contract
     // const smartContractAddress = optionSmartContract.at(address);?
     optionSmartContract.options.address = smartContractAddress;
   }
 }
-
-
-module.exports = {optionSmartContractOperations: optionSmartContractOperations};

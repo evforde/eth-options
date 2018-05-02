@@ -5,9 +5,6 @@ const router = express.Router();
 // local dependencies
 const IPFS = require("../back-end-js/IPFS.js");
 const auth = require("../back-end-js/metamask-auth.js");
-const optionSmartContract = require("../back-end-js/option-smart-contract-interface.js")
-
-
 
 // GETs
 
@@ -19,19 +16,17 @@ router.get("/getFromIPFS", function(req, res) {
 
 
 // POSTs
-
-
-router.post("/deployOptionSmartContract", function(req, res) {
-  // console.log(req);
-  const optionObj = req.body;
-  const smartContractAddress = "";
-  console.log(optionObj, " API hit for deploying smart contract for option")
-  newContract = new optionSmartContract.optionSmartContractOperations(optionObj);
-  smartContractAddress, optionSmartContractInstance = newContract.instantiateOptionSmartContract(optionObj);
-  // newContract.despositFunds(smartContractAddress, optionObj, optionSmartContractInstance);
-  // res.status(200).send({smartContractAddress: smartContractAddress});
-
-});
+// dont in front end
+// router.post("/deployOptionSmartContract", function(req, res) {
+//   // console.log(req);
+//   const optionObj = req.body;
+//   const smartContractAddress = "";
+//   console.log(optionObj, " API hit for deploying smart contract for option")
+//   newContract = new optionSmartContract.optionSmartContractOperations(optionObj);
+//   smartContractAddress, optionSmartContractInstance = newContract.instantiateOptionSmartContract(optionObj);
+//   // newContract.despositFunds(smartContractAddress, optionObj, optionSmartContractInstance);
+//   // res.status(200).send({smartContractAddress: smartContractAddress});
+// });
 
 router.post("/appendToIPFS", function(req, res) {
   // console.log('body to here', req.body);

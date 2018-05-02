@@ -33,10 +33,7 @@ $(document).ready(function() {
     offerExpiry = $("offerExpiry").text();
     optionValue = $("numberETH").text();
 
-    // get tradingAccountAddress for this metamask user address!
-    // optionCreatorAddress = web3.eth.contracts[0] //TODO correct? from metamask...
-
-
+    // TODO unless use tradingaccount ?
     getMetamaskAccount(function(optionCreatorAddress) {
 
 
@@ -44,37 +41,26 @@ $(document).ready(function() {
          premiumPrice, optionCreatorAddress, optionCreatorType,
         optionValue, offerExpiry);
 
-      $.ajax({
-        type: "POST",
-        url: "/api/deployOptionSmartContract",
-        data: curOption,
-        dataType: "json",
-        async: true,
-        error: (err) => {
-          console.log(err, "error from deployOptionSmartContract post");
-          // alert("ERROR deploying smart contract");
-          return err;
-        },
-        success: (res) => {
-          console.log("result from deployOptionSmartContract post is", res);
 
-          console.log('writing to ipfs');
-          sendToIPFS(curOption);
+      // instantiateOptionSmartContract
+      const interfaceInstance = new optionSmartContractInterface(curOption);
+      // smartContractAddress, optionSmartContractInstance = interfaceInstance.instantiateOptionSmartContract(optionObj);
+      interfaceInstance.instantiateOptionSmartContract(curOption);
+      // interfaceInstance.despositFunds(smartContractAddress, curOption, optionSmartContractInstance);
 
-          //TODO(moezinia) NEED to return the smartContractAddress in response from deploying contracts
-          // set setSmartContractAddress is set in back end
+      //TODO(moezinia) NEED to return the smartContractAddress in response from deploying contracts
+      // save to curOption, so can access later for fulfillemntj
 
-          // 4) upload the optin to ipfs
-          //
-          // 5) update list of unfulfilled options
-          //
-          // 6) update list of 'my options' tab
-          // update list of unfulfilled options
+      // 4) upload the optin to ipfs
+      sendToIPFS(curOption);
 
-          //update my options tab
-          return res;
-        }
-      });
+      // 5) update list of unfulfilled options
+      //
+      // 6) update list of 'my options' tab
+      // update list of unfulfilled options
+
+      //update my options tab
+
 
 
     });

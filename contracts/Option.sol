@@ -29,7 +29,7 @@ contract Option {
   event LogTransferMade(address sender, address receiver, uint amount);
 
 
-  function Option(bool _optionType, uint _strikePriceUSD,
+  constructor(bool _optionType, uint _strikePriceUSD,
     uint _maturityTime, uint _cancellationTime,
     uint _premiumAmount, bool _traderType) public payable {
     require(_optionType == false); // Only allow calls
