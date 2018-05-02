@@ -2,23 +2,23 @@ class callOption {
   constructor(maturityDate, ETHStrikePrice,
     premiumPrice, optionCreatorAddress,
     optionCreatorType, optionValue, offerExpiry) {
+    this.underlyingAmount = 1000000000000000000; //1 eth in wei
     this.maturityDate = maturityDate;
     this.ETHStrikePrice = ETHStrikePrice;
     this.premiumPrice = premiumPrice
     this.optionCreatorAddress = optionCreatorAddress;
     this.optionCreatorType = optionCreatorType;
-    this.optionValue = optionValue;
     // only allow fulfillemnt before certain datetime
     this.offerExpiry = offerExpiry;
     this.optionType = false; //call option...
   }
 
-  set setSmartContractAddress(address) {
+  setSmartContractAddress(address) {
     this.contractAddress = address;
   }
 
   // Getters
-  get contractAddress() {
+  contractAddress() {
     return this.contractAddress;
   }
 }
@@ -29,18 +29,25 @@ $(document).ready(function() {
     maturityDate = $("maturity").text();
     ETHStrikePrice = $("ETHStrikePrice").text();
     premiumPrice = $("premiumPrice").text();
-    optionCreatorType = "writer";//or holder TODO how to do this nicely in UI - create bid /create ask>?
+    //buyer/holder = True, seller/writer = False.
+    optionCreatorType = true;//or writer TODO how to do this nicely in UI - create bid /create ask>?
     offerExpiry = $("offerExpiry").text();
-    optionValue = $("numberETH").text();
+
+    //TODO remove, just for testing
+    premiumPrice = 0.1;
+    offerExpiry = 100;
+    ETHStrikePrice = 2;
+    maturityDate = 100;
+    //TODO
+
 
     // TODO unless use tradingaccount ?
     getMetamaskAccount(function(optionCreatorAddress) {
 
 
       const curOption = new callOption(maturityDate, ETHStrikePrice,
-         premiumPrice, optionCreatorAddress, optionCreatorType,
-        optionValue, offerExpiry);
-
+        premiumPrice, optionCreatorAddress, optionCreatorType,
+        offerExpiry);
 
       // instantiateOptionSmartContract
       const interfaceInstance = new optionSmartContractInterface(curOption);

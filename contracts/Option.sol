@@ -34,14 +34,14 @@ contract Option {
     uint _premiumAmount, bool _traderType) public payable {
     require(_optionType == false); // Only allow calls
     // set optionBuyer/optionSeller based on optionCreatorType
-    if (_traderType) {
+    /* if (_traderType) {
       require(msg.value == premiumAmount);
       optionBuyer = msg.sender;
     }
     else {
       require(msg.value == underlyingAmount);
       optionSeller = msg.sender;
-    }
+    } */
 
     optionCreatorType = _traderType;
     optionType = _optionType;
