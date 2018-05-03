@@ -50,3 +50,15 @@ p, span, h1, h2 {
     margin-right: auto;
     padding: 10px 0;
 }
+.btn {
+  display: inline-block;
+  color: #4e4e9d;
+  border-bottom: 2px solid #4e4e9d;
+  padding: 2px 12px;
+  cursor: pointer;
+  transition: .2s all ease-in-out;
+}
+.btn:hover {
+  border-bottom-width: 4px;
+  padding-bottom: 0px;
+}
