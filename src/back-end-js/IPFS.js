@@ -7,7 +7,7 @@ const series = require('async/series');
 
 function sendToIPFS(dataToSend) {
   node.files.add({
-    path: 'hello.txt',
+    path: 'all-options.txt',
     content: Buffer.from(JSON.stringify(dataToSend))
   }, (err, filesAdded) => {
     if (err) {

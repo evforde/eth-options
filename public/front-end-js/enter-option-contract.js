@@ -29,11 +29,11 @@ $(document).ready(function() {
       }
 
 
-      // const optionContract = web3.eth.contract(OptionContractABI);
       const optionContract = web3.eth.contract(OptionContractABI, null, fallbackValues);
-      const optionSmartContract = web3.eth.contract.at(optionObj.smartContractAddress);
+      const optionSmartContract = optionContract.at(optionObj.smartContractAddress);
+      //a = rick.isActive.call((err,res)=> {console.log(res)}); to check variable values
 
-      const transactionObj = {
+      const fallbackValues = {
         // data: bytecode,
         data: OptionContractBinary,
         from: this.optionObj.optionFulfillerAddress,
@@ -42,26 +42,27 @@ $(document).ready(function() {
         value: valueToSend
       }
 
-      optionSmartContract.activateContract(optionFulfillerType, true, transactionObj, (res) => {
-        if (res == "failure") {
-          console.log("FAILURE to Desposit Funds. Abort!");
-        }
+      optionSmartContract.activateContract(optionFulfillerType, fallbackValues,
+        (err, res) => {
+          if(err) {
+            alert("facking", err);
+          }
+          else {
+            //SUCCESS
+            // could return success of method call.
+            optionObj.active = true;
+            alert("option activated");
+            //TODO(moezinia) change it to active on IPFS somehow...
+            // sendToIPFS(curOption);
+
+            // call update-order-book
+            // call update - user specific tingz ' my options'
+            //update my options tab
+
+
+
+          }
       });
-
-      // could return success of method call.
-      optionObj.active = true;
-
-
-      
-      //TODO(moezinia) change it to active on IPFS somehow...
-      // sendToIPFS(curOption);
-
-      // call update-order-book
-      // call update - user specific tingz ' my options'
-      //update my options tab
-
-
-
     });
   });
 });

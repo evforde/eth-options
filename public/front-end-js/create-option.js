@@ -54,21 +54,6 @@ $(document).ready(function() {
       const interfaceInstance = new optionSmartContractInterface(curOption);
       // smartContractAddress, optionSmartContractInstance = interfaceInstance.instantiateOptionSmartContract(optionObj);
       smartContractAddress = interfaceInstance.instantiateOptionSmartContract(curOption);
-      // interfaceInstance.despositFunds(smartContractAddress, curOption);
-      curOption.setSmartContractAddress(smartContractAddress);
-
-      // 4) upload the optin to ipfs
-      sendToIPFS(curOption);
-
-      // 5) update list of unfulfilled options
-      //
-      // 6) update list of 'my options' tab
-      // update list of unfulfilled options
-
-      //update my options tab
-
-
-
     });
 
   });

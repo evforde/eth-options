@@ -53,7 +53,7 @@ contract Option {
     isActive = false;
   }
 
-  function activateContract(bool traderType) payable public{
+  function activateContract(bool traderType) payable public {
     require(!isActive);
     require(traderType == !optionCreatorType);
     require(block.timestamp < cancellationTime); // TODO(eforde): otherwise cancel

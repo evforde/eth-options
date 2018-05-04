@@ -24,6 +24,9 @@ fs.readFile("./public/contracts/__contracts_Option_sol_Option.bin", "ascii", fun
   optionContractBinary = data;
 });
 
+//TODO fetch all options (unfulfilled) from IPFS
+const unfulfilledOptions = [];
+
 
 
 router.get("/", function(req, res, next) {
@@ -42,6 +45,7 @@ router.get("/dashboard", function(req, res, next) {
     // tradingAccountBinary: tradingAccountBinary,
     optionContractABI: optionContractABI,
     optionContractBinary: optionContractBinary
+    //TODO(moezinia) unfulfilledOptions: unfulfilledOptions
   });
 });
 

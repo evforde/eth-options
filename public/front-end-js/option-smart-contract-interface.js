@@ -8,9 +8,11 @@ class optionSmartContractInterface {
     //TODO(moezinia) optimize gas and price..
     this.maxGasProvided = 1000000; //gas limit max 4665264   860444 used for create/deposit!
     this.gasPrice = "20000000000"; // 20 Gwei (next few blocks ~ few seconds)
+    this.valueToSend = 0;
   }
 
-  instantiateOptionSmartContract() {
+  instantiateOptionSmartContract(curOption) {
+    var smartContractAddress = "";
     // Compile the source code
     //TODO could use a new FileReader that compiles...
     // const input = fs.readFileSync('./contracts/Option.sol', 'utf8');
@@ -22,10 +24,10 @@ class optionSmartContractInterface {
 
     // true is holder/buyer, false writer
     if (this.optionObj.optionCreatorType) {
-      const valueToSend = web3.toWei(this.optionObj.premiumPrice, 'ether');
+      this.valueToSend = web3.toWei(this.optionObj.premiumPrice, 'ether');
     }
     else {
-      const valueToSend = this.optionObj.underlyingAmount; // already in wei
+      this.valueToSend = this.optionObj.underlyingAmount; // already in wei
     }
 
     const fallbackValues = {
@@ -34,7 +36,7 @@ class optionSmartContractInterface {
       from: this.optionObj.optionCreatorAddress,
       gas: this.maxGasProvided,
       gasPrice: this.gasPrice,
-      value: valueToSend
+      value: this.valueToSend
     }
     // const optionContract = web3.eth.contract(OptionContractABI);
     const optionContract = web3.eth.contract(OptionContractABI, null, fallbackValues);
@@ -58,9 +60,19 @@ class optionSmartContractInterface {
           console.log("txn ", data.transactionHash, "follow progress at https://ropsten.etherscan.io/tx/" + data.transactionHash);
         }
         if (data.address) {
-          console.log("successfully deployed contract at ", data.address);
+          smartContractAddress = data.address;
+          curOption.smartContractAddress = smartContractAddress;
+          console.log("successfully deployed contract at ", smartContractAddress);
           console.log("contract info ", data);
-          return data.address;
+          console.log(curOption, ' see if saved');
+          sendToIPFS(curOption);
+
+          // 5) update list of unfulfilled options
+          //
+          // 6) update list of 'my options' tab
+          // update list of unfulfilled options
+
+          //update my options tab
         }
       });
   }
