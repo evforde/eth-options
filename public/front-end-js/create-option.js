@@ -1,3 +1,79 @@
+// const fs = require('fs');
+// const solc = require('solc');
+
+class createOptionSmartContract {
+
+  constructor(_optionObj) {
+    this.optionObj = _optionObj;
+    //TODO(moezinia) optimize gas and price..
+    this.maxGasProvided = 1000000; //gas limit max 4665264   860444 used for create/deposit!
+    this.gasPrice = "20000000000"; // 20 Gwei (next few blocks ~ few seconds)
+    this.valueToSend = 0;
+  }
+
+  instantiateOptionSmartContract(curOption) {
+    var smartContractAddress = "";
+    // Compile the source code
+    //TODO could use a new FileReader that compiles...
+    // const input = fs.readFileSync('./contracts/Option.sol', 'utf8');
+    // const output = solc.compile(input, 1);
+    // // console.log(output, "output");
+    // const bytecode = output.contracts[':Option'].bytecode;
+    // // abi is jsoninterface https://web3js.readthedocs.io/en/1.0/glossary.html#glossary-json-interface
+    // const abi = JSON.parse(output.contracts[':Option'].interface);
+
+    // true is holder/buyer, false writer
+    if (this.optionObj.optionCreatorType) {
+      this.valueToSend = web3.toWei(this.optionObj.premiumPrice, 'ether');
+    }
+    else {
+      this.valueToSend = this.optionObj.underlyingAmount; // already in wei
+    }
+
+    const fallbackValues = {
+      // data: bytecode,
+      data: OptionContractBinary,
+      from: this.optionObj.optionCreatorAddress,
+      gas: this.maxGasProvided,
+      gasPrice: this.gasPrice,
+      value: this.valueToSend
+    }
+    const optionContract = web3.eth.contract(OptionContractABI, null, fallbackValues);
+    this.optionContract = optionContract;
+
+    const constructorArgs = [this.optionObj.type, this.optionObj.ETHStrikePrice,
+      this.optionObj.maturityDate, this.optionObj.offerExpiry,
+      this.optionObj.premiumPrice, this.optionObj.optionCreatorType];
+
+    const optionSmartContract = optionContract.new(constructorArgs[0],
+      constructorArgs[1], constructorArgs[2], constructorArgs[3],
+      constructorArgs[4], constructorArgs[5],
+      fallbackValues, function(err, data) {
+        // callback fires multiple times...
+        if (err) {
+          console.log(err);
+          return;
+        }
+        if (data && data.address === undefined) {
+          console.log("waiting for someone to mine block...");
+          console.log("txn ", data.transactionHash, "follow progress at https://ropsten.etherscan.io/tx/" + data.transactionHash);
+        }
+        if (data.address) {
+          smartContractAddress = data.address;
+          curOption.smartContractAddress = smartContractAddress;
+          console.log("successfully deployed contract at ", smartContractAddress);
+          console.log("contract info ", data);
+          console.log(curOption, ' see if saved');
+
+          //TODO(moezinia) call set cookie
+          //TODO(moezinia) call load unactivated options into dashboard
+          // 6) update list of 'my options' tab?
+        }
+      });
+  }
+}
+
+
 class callOption {
   constructor(maturityDate, ETHStrikePrice,
     premiumPrice, optionCreatorAddress,
@@ -23,6 +99,9 @@ class callOption {
     return this.contractAddress;
   }
 }
+
+
+// ---------------Action JS Here--------------------//
 
 $(document).ready(function() {
 
@@ -51,7 +130,7 @@ $(document).ready(function() {
         offerExpiry);
 
       // instantiateOptionSmartContract
-      const interfaceInstance = new optionSmartContractInterface(curOption);
+      const interfaceInstance = new createOptionSmartContract(curOption);
       // smartContractAddress, optionSmartContractInstance = interfaceInstance.instantiateOptionSmartContract(optionObj);
       smartContractAddress = interfaceInstance.instantiateOptionSmartContract(curOption);
     });
@@ -61,21 +140,27 @@ $(document).ready(function() {
 });
 
 
-function sendToIPFS(payload) {
-  $.ajax({
-    type: "POST",
-    url: "/api/appendToIPFS",
-    data: {
-      data: payload,
-      maturity: payload.maturity
-    },
-    error: function(err) {
-      console.log(err, "error from post");
-      return err;
-    },
-    success: function(res) {
-      // console.log("result from post is", res);
-      return res;
-    }
-  });
-}
+
+
+
+
+
+
+// function sendToIPFS(payload) {
+//   $.ajax({
+//     type: "POST",
+//     url: "/api/appendToIPFS",
+//     data: {
+//       data: payload,
+//       maturity: payload.maturity
+//     },
+//     error: function(err) {
+//       console.log(err, "error from post");
+//       return err;
+//     },
+//     success: function(res) {
+//       // console.log("result from post is", res);
+//       return res;
+//     }
+//   });
+// }

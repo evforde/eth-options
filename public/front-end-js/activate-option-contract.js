@@ -1,3 +1,8 @@
+
+
+
+//---------------Activate/Enter Into Option Contract----------------------//
+
 $(document).ready(function() {
   // # id . class
   $(".acceptOptionOffer").click(function() {
@@ -45,21 +50,14 @@ $(document).ready(function() {
       optionSmartContract.activateContract(optionFulfillerType, fallbackValues,
         (err, res) => {
           if(err) {
-            alert("facking", err);
+            alert("Error Activating", err);
           }
           else {
             //SUCCESS
             // could return success of method call.
             optionObj.active = true;
             alert("option activated");
-            //TODO(moezinia) change it to active on IPFS somehow...
-            // sendToIPFS(curOption);
-
-            // call update-order-book
-            // call update - user specific tingz ' my options'
-            //update my options tab
-
-
+            //TODO(moezinia) set cookie with smart contract and account address
 
           }
       });
