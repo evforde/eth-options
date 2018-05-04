@@ -1,0 +1,16 @@
+<% if (typeof currentPrice != "number" || !currentPrice) { currentPrice = false; } %>
+<% if (!currentPrice) { %>
+<div class="option-item" data-strike="<%=strike%>">
+  <div class="strike-info">
+    <p class="strike">$<%=strike%> strike</p>
+    <p class="option-type">call</p>
+  </div>
+  <div class="price-info">
+    <p>$<%=price%></p>
+  </div>
+</div>
+<% } else { %>
+<div id="current-price-marker" class="option-item">
+  <p>current price: $<%=currentPrice%></p>
+</div>
+<% } %>

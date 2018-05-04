@@ -1,0 +1,92 @@
+#expiration-dates {
+  height: 64px;
+  max-height: 64px;
+  overflow: hidden;
+  position: fixed;
+  z-index: 5;
+}
+.date {
+  float: left;
+  padding: 20px 60px;
+  background-color: #555;
+  opacity: 0.97;
+  font-size: 20px;
+  color: white;
+  cursor: pointer;
+  transition: .2s;
+  border-right: 1px solid #777;
+}
+.date:hover {
+  background-color: #999;
+}
+#options-content {
+  padding-top: 64px;
+}
+#options {
+  border-collapse: collapse;
+}
+#current-price-marker {
+  height: 30px;
+  background: #eee;
+  cursor: auto !important;
+}
+#current-price-marker p {
+  height: 30px;
+  position: relative;
+  top: 4px;
+  color: #333;
+  width: 100%;
+  text-align: center;
+}
+.option-item {
+  max-height: 85px;
+  height: 85px;
+  width: 100%;
+  border-bottom: 1px solid #aaa !important;
+  transition: .2s;
+  cursor: pointer !important;
+}
+.option-item:hover {
+  background: #eee;
+  opacity: 1 !important;
+}
+.option-item:hover .price-info {
+  border-right-color: #f00;
+}
+.option-item > * {
+  height: 85px;
+  float: left;
+}
+.option-item .strike-info {
+  width: calc(100% - 102px);
+  position: relative;
+  top: 22px;
+}
+.option-item .strike-info .strike {
+  font-size: 20px;
+  color: #333;
+  font-size: 24px;
+  white-space: nowrap;
+  max-width: 80%;
+  overflow: hidden;
+  height: 30px;
+}
+.option-item .strike-info .option-type {
+  font-size: 12px;
+  text-transform: lowercase;
+  letter-spacing: 1px;
+  color: #aaa;
+}
+.option-item .price-info {
+  width: 100px;
+  color: #fff;
+  background-color: #eee;
+  font-size: 24px;
+  padding-right: 2px;
+  transition: .2s;
+  overflow: hidden;
+  text-align: center;
+}
+.option-item .price-info p {
+  margin-top: 30px;
+}

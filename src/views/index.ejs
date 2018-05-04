@@ -2,7 +2,7 @@
 <html>
 <head>
   <title>ETH</title>
-  <script src="/static/front-end-js/jquery-3.3.1.min.js"></script>
+  <script src="/static/front-end-js/lib/jquery-3.3.1.min.js"></script>
   <script src="/static/front-end-js/metamask.js"></script>
   <script src="/static/front-end-js/login.js"></script>
   <link rel="stylesheet" type="text/css" href="/static/css/shared.css">
@@ -10,14 +10,13 @@
 </head>
 
 <body>
-  <div id="header">
-    <span id="title">eth</span>
-  </div>
+  <% include ./partials/header %>
+
   <div id="page">
     <div id="container">
       <div id="content">
         <span id="welcome">welcome.</span>
-        <span id="login">log in</span>
+        <span id="login">LOG IN</span>
       </div>
     </div>
   </div>

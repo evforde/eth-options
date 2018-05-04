@@ -49,6 +49,12 @@ router.get("/dashboard", function(req, res, next) {
   });
 });
 
+router.get("/exchange", function(req, res, next) {
+  res.render("exchange", {
+    user: req.user
+  });
+});
+
 router.get("/unfulfilled", function(req, res, next) {
   // could add authentication here... if authetnicated:
   res.render("unfulfilled_options", { user: req.user });

@@ -1,0 +1,18 @@
+<% if(typeof user != "string" || !user) { user = false; } %>
+<link rel="stylesheet" href="/static/css/header.css" />
+<div id="navbar">
+  <div class="content">
+    <% if (user) { %>
+    <div id="navbar-left">
+      <ul id="navbar-links">
+        <a id="dashboard-button" href="/dashboard"><li class="navbar-item">dashboard</li></a>
+        <a id="trade-button" href="/exchange"><li class="navbar-item">exchange</li></a>
+      </ul>
+    </div>
+    <% } %>
+    <div id="navbar-right">
+      <a id="title" href="/"><li id="title" class="navbar-item">ETH</li></a>
+    </div>
+  </div>
+</div>
+<div id="navbar-spacer"></div>

@@ -28,17 +28,18 @@
   color: #fff;
 }
 #login {
-  color: #fff;
+  display: inline-block;
+  color: white;
   margin-top: 64px;
   padding: 2px 24px;
+  border-bottom: 2px transparent solid;
   font-size: 32px;
+  text-transform: uppercase;
+  font-weight: 100;
   cursor: pointer;
-  border-bottom: 2px solid #fff;
-  transition: all .2s ease-in-out;
-  display: inline-block;
+  transition: .2s;
 }
 #login:hover {
-  color: #373782;
-  border-bottom: 4px solid #373782;
-  padding-bottom: 0px;
+  color: #6b6ba9;
+  border-bottom: 2px #6b6ba9 solid;
 }

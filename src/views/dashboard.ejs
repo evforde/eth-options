@@ -6,10 +6,10 @@
   <script src="https://unpkg.com/ipfs-api@9.0.0/dist/index.js"
   integrity="sha384-5bXRcW9kyxxnSMbOoHzraqa7Z0PQWIao+cgeg327zit1hz5LZCEbIMx/LWKPReuB"
   crossorigin="anonymous"></script>
-  <script src="/static/front-end-js/jquery-3.3.1.min.js"></script>
-  <link rel="stylesheet" type="text/css" href="/static/css/shared.css">
+  <script src="/static/front-end-js/lib/jquery-3.3.1.min.js"></script>
   <script src="/static/front-end-js/create-option.js"></script>
   <script src="/static/front-end-js/dashboard.js"></script>
+  <link rel="stylesheet" type="text/css" href="/static/css/shared.css">
   <script>
     const TradingAccountABI = JSON.parse('<%= tradingAccountABI %>'.replace(/&#34;/g, "\"").slice(1, -1));
     // TODO(eforde): only include this if no trading account for current user
@@ -18,9 +18,8 @@
 </head>
 
 <body>
-  <div id="header">
-    <span id="title">eth</span>
-  </div>
+  <% include ./partials/header %>
+
   <div id="page">
     <div class="container">
       <div class="content">
