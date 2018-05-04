@@ -55,6 +55,17 @@ router.get("/exchange", function(req, res, next) {
   });
 });
 
+router.get("/trade", function(req, res, next) {
+  if (!req.query || !req.query.strike || !req.query.date) {
+    res.redirect("/exchange");
+  }
+  res.render("trade", {
+    user: req.user,
+    strike: req.query.strike,
+    date: req.query.date
+  });
+});
+
 router.get("/unfulfilled", function(req, res, next) {
   // could add authentication here... if authetnicated:
   res.render("unfulfilled_options", { user: req.user });

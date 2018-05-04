@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ETH</title>
+  <script src="/static/front-end-js/metamask.js"></script>
+  <script src="/static/front-end-js/lib/jquery-3.3.1.min.js"></script>
+  <script src="/static/front-end-js/lib/ejs.min.js"></script>
+  <script src="/static/front-end-js/trade.js"></script>
+  <link rel="stylesheet" type="text/css" href="/static/css/shared.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/trade.css">
+  <script>
+    var date = "<%= date %>";
+    var strike = <%= strike %>;
+  </script>
+</head>
+<body>
+  <% include ./partials/popup %>
+  <% include ./partials/header %>
+
+  <div id="page">
+    <div class="container">
+      <div class="content">
+        <h1 id="option-name"><%= date %> $<%= strike %> CALL</h1>
+      </div>
+    </div>
+
+    <div class="container">
+      <div id="bids-content" class="content">
+        <div class="bid-ask-header">
+          <h2>BIDS</h2>
+          <span id="new-bid-button">+</span>
+        </div>
+        <div id="bids">
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div id="asks-content" class="content">
+        <div class="bid-ask-header">
+          <h2>ASKS</h2>
+          <span id="new-ask-button">+</span>
+        </div>
+        <div id="asks">
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

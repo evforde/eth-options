@@ -1,0 +1,76 @@
+.bid-ask-header {
+  margin-top: 24px;
+  height: 44px;
+}
+.bid-ask-header h2 {
+  font-weight: 100;
+  letter-spacing: 1px;
+  margin-top: 4px;
+  float: left;
+}
+.bid-ask-header #new-bid-button, .bid-ask-header #new-ask-button {
+  background: #4e4e9d;
+  color: #fff;
+  font-size: 24px;
+  padding: 8px 8px;
+  float: right;
+  cursor: pointer;
+  transition: .2s;
+}
+.bid-ask-header #new-bid-button:hover, .bid-ask-header #new-ask-button:hover {
+  color: #6b6ba9;
+  transform: scale(1.05);
+}
+#bids, #asks {
+  border-bottom: 1px solid #aaa !important;
+}
+.bid-ask-item {
+  max-height: 60px;
+  height: 60px;
+  width: 100%;
+  border-top: 1px solid #aaa !important;
+  transition: .2s;
+  cursor: pointer !important;
+}
+.bid-ask-item:hover {
+  background: #eee;
+  opacity: 1 !important;
+  transform: scale(1.01);
+}
+.bid-ask-item > * {
+  height: 60px;
+  float: left;
+}
+.bid-ask-item .party-info {
+  width: calc(100% - 102px);
+  position: relative;
+  top: 10px;
+}
+.bid-ask-item .party-info .address {
+  font-size: 20px;
+  color: #333;
+  font-size: 18px;
+  white-space: nowrap;
+  max-width: 80%;
+  overflow: hidden;
+  height: 30px;
+}
+.bid-ask-item .party-info .party-type {
+  font-size: 12px;
+  text-transform: lowercase;
+  letter-spacing: 1px;
+  color: #aaa;
+}
+.bid-ask-item .premium-info {
+  width: 100px;
+  color: #fff;
+  background-color: #eee;
+  font-size: 18px;
+  padding-right: 2px;
+  transition: .2s;
+  overflow: hidden;
+  text-align: center;
+}
+.bid-ask-item .premium-info p {
+  margin-top: 20px;
+}

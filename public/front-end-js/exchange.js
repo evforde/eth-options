@@ -5,7 +5,7 @@ var timeout = false;
 var delta = 200;
 
 $(window).ready(function() {
-  let options = []
+  let options = [];
   for (let i = 0; i < 100; i++) {
     options.push({strike: 300 + i * 10, price: .1 + i * .1});
   }
@@ -15,15 +15,15 @@ $(window).ready(function() {
 // TODO(eforde): Call this with real data from order book
 function populateOptions(options, currentPrice) {
   $.get('/static/ejs/option-item.ejs', function (template) {
-    let queuedTemplate = ejs.compile(template);
+    let optionItemTemplate = ejs.compile(template);
     let scrollTop = 0;
     for (let i = 0; i < options.length; i++) {
-      $('#options').append(queuedTemplate(options[i]));
+      $('#options').append(optionItemTemplate(options[i]));
       // Add current price marker
       if (currentPrice > options[i].strike &&
           (i + 1) < options.length &&
           currentPrice <= options[i + 1].strike) {
-        $('#options').append(queuedTemplate({currentPrice: currentPrice}));
+        $('#options').append(optionItemTemplate({currentPrice: currentPrice}));
       }
     }
     rebindEventHandlers();
@@ -35,7 +35,9 @@ function populateOptions(options, currentPrice) {
 
 function rebindEventHandlers() {
   $("#options .option-item:not(#current-price-marker)").click(function() {
-    console.log($(this).attr("data-strike"));
+    let strike = $(this).attr("data-strike");
+    // TODO(eforde): redirect to proper trade page
+    window.location = "/trade?strike=" + strike + "&date=asdads";
   });
 }
 

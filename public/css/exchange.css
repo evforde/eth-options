@@ -1,7 +1,8 @@
 #expiration-dates {
   height: 64px;
   max-height: 64px;
-  overflow: hidden;
+  overflow-x: scroll;
+  overflow-y: none;
   position: fixed;
   z-index: 5;
 }
@@ -51,7 +52,7 @@
   opacity: 1 !important;
 }
 .option-item:hover .price-info {
-  border-right-color: #f00;
+  border-right-color: #f00; /* TODO */
 }
 .option-item > * {
   height: 85px;
