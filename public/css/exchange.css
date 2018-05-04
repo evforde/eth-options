@@ -78,7 +78,7 @@
   letter-spacing: 1px;
   color: #aaa;
 }
-.option-item .price-info {
+.option-item .premium-info {
   width: 100px;
   color: #fff;
   background-color: #eee;
@@ -88,6 +88,6 @@
   overflow: hidden;
   text-align: center;
 }
-.option-item .price-info p {
+.option-item .premium-info p {
   margin-top: 30px;
 }

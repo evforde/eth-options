@@ -7,7 +7,7 @@ var delta = 200;
 $(window).ready(function() {
   let options = [];
   for (let i = 0; i < 100; i++) {
-    options.push({strike: 300 + i * 10, price: .1 + i * .1});
+    options.push({strike: 300 + i * 10, premium: .1 + i * .1});
   }
   populateOptions(options, 450);
 });
@@ -37,7 +37,7 @@ function rebindEventHandlers() {
   $("#options .option-item:not(#current-price-marker)").click(function() {
     let strike = $(this).attr("data-strike");
     // TODO(eforde): redirect to proper trade page
-    window.location = "/trade?strike=" + strike + "&date=asdads";
+    window.location = "/trade?strike=" + strike + "&date=5/5";
   });
 }
 
