@@ -15,6 +15,8 @@ const fs      = require("fs");
 
 var tradingAccountABI;
 var tradingAccountBinary;
+var optionContractABI;
+var optionContractBinary;
 
 fs.readFile("./public/contracts/__contracts_TradingAccount_sol_TradingAccount.abi", "ascii", function(err, data) {
   if (err)
@@ -26,6 +28,18 @@ fs.readFile("./public/contracts/__contracts_TradingAccount_sol_TradingAccount.bi
   if (err)
     throw err;  // make sure you've compiled the smart contracts!
   tradingAccountBinary = data;
+});
+
+fs.readFile("./public/contracts/__contracts_Option_sol_Option.abi", "ascii", function(err, data) {
+  if (err)
+    throw err;  // make sure you've compiled the smart contracts!
+  optionContractABI = JSON.stringify(data);
+});
+
+fs.readFile("./public/contracts/__contracts_Option_sol_Option.bin", "ascii", function(err, data) {
+  if (err)
+    throw err;  // make sure you've compiled the smart contracts!
+  optionContractBinary = data;
 });
 
 //
