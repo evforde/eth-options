@@ -34,14 +34,14 @@ contract Option {
     uint _premiumAmount, bool _traderType) public payable {
     require(_optionType == false); // Only allow calls
     // set optionBuyer/optionSeller based on optionCreatorType
-    /* if (_traderType) {
+    if (_traderType) {
       require(msg.value == premiumAmount);
       optionBuyer = msg.sender;
     }
     else {
       require(msg.value == underlyingAmount);
       optionSeller = msg.sender;
-    } */
+    }
 
     optionCreatorType = _traderType;
     optionType = _optionType;
@@ -122,7 +122,7 @@ contract Option {
   // ===== Utility functions ===== //
 
 
-  function inTheMoney(uint curEthPrice) private view returns (bool) {
+  function inTheMoney(uint curEthPrice) public view returns (bool) {
     // TODO(eforde): verify price is correct, or fetch price from on-chain
     // fiat contract
     return (optionType && (curEthPrice < strikePriceUSD)) || // put
