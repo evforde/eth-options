@@ -5,9 +5,6 @@ const router = express.Router();
 // local dependencies
 const IPFS = require("../back-end-js/IPFS.js");
 const auth = require("../back-end-js/metamask-auth.js");
-const optionSmartContract = require("../back-end-js/option-smart-contract-interface.js")
-
-
 
 // GETs
 
@@ -17,23 +14,10 @@ router.get("/getFromIPFS", function(req, res) {
   res.send(data);
 });
 
-
-// POSTs
-
-
-router.post("/deployOptionSmartContract", function(req, res) {
-
-
-  optionSmartContractOperations(req.body);
-  // res.status(200).send({});
-
-
-
-});
-
 router.post("/appendToIPFS", function(req, res) {
   // console.log('body to here', req.body);
   const result = IPFS.sendToIPFS(req.body);
+  //TODO(moezinia) sent something more useful...
   res.send({ response: result });
 });
 

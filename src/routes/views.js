@@ -41,11 +41,13 @@ router.get("/index", function(req, res, next) {
 });
 
 router.get("/dashboard", function(req, res, next) {
-  console.log("ABI:", tradingAccountABI);
+  // console.log("ABI:", tradingAccountABI);
   res.render("dashboard", {
     user: req.user,
     tradingAccountABI: tradingAccountABI,
-    tradingAccountBinary: tradingAccountBinary
+    tradingAccountBinary: tradingAccountBinary,
+    optionContractABI: optionContractABI,
+    optionContractBinary: optionContractBinary
   });
 });
 

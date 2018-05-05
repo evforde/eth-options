@@ -33,7 +33,7 @@ $("#login").click(function() {
               window.location = "/dashboard";
             }, 200);
           }
-          else 
+          else
             alert("Could not authenticate");
         }
       });

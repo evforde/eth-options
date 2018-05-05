@@ -1,26 +1,107 @@
+// const fs = require('fs');
+// const solc = require('solc');
+
+class createOptionSmartContract {
+
+  constructor(_optionObj) {
+    this.optionObj = _optionObj;
+    //TODO(moezinia) optimize gas and price..
+    this.maxGasProvided = 1000000; //gas limit max 4665264   860444 used for create/deposit!
+    this.gasPrice = "20000000000"; // 20 Gwei (next few blocks ~ few seconds)
+    this.valueToSend = 0;
+  }
+
+  instantiateOptionSmartContract(curOption) {
+    var smartContractAddress = "";
+    // Compile the source code
+    //TODO could use a new FileReader that compiles...
+    // const input = fs.readFileSync('./contracts/Option.sol', 'utf8');
+    // const output = solc.compile(input, 1);
+    // // console.log(output, "output");
+    // const bytecode = output.contracts[':Option'].bytecode;
+    // // abi is jsoninterface https://web3js.readthedocs.io/en/1.0/glossary.html#glossary-json-interface
+    // const abi = JSON.parse(output.contracts[':Option'].interface);
+
+    // true is holder/buyer, false writer
+    if (this.optionObj.optionCreatorType) {
+      this.valueToSend = web3.toWei(this.optionObj.premiumPrice, 'ether');
+    }
+    else {
+      this.valueToSend = this.optionObj.underlyingAmount; // already in wei
+    }
+
+    const fallbackValues = {
+      // data: bytecode,
+      data: OptionContractBinary,
+      from: this.optionObj.optionCreatorAddress,
+      gas: this.maxGasProvided,
+      gasPrice: this.gasPrice,
+      value: this.valueToSend
+    }
+    const optionContract = web3.eth.contract(OptionContractABI, null, fallbackValues);
+    this.optionContract = optionContract;
+
+    const constructorArgs = [this.optionObj.type, this.optionObj.ETHStrikePrice,
+      this.optionObj.maturityDate, this.optionObj.offerExpiry,
+      this.optionObj.premiumPrice, this.optionObj.optionCreatorType];
+
+    const optionSmartContract = optionContract.new(constructorArgs[0],
+      constructorArgs[1], constructorArgs[2], constructorArgs[3],
+      constructorArgs[4], constructorArgs[5],
+      fallbackValues, function(err, data) {
+        // callback fires multiple times...
+        if (err) {
+          console.log(err);
+          return;
+        }
+        if (data && data.address === undefined) {
+          console.log("waiting for someone to mine block...");
+          console.log("txn ", data.transactionHash, "follow progress at https://ropsten.etherscan.io/tx/" + data.transactionHash);
+        }
+        if (data.address) {
+          smartContractAddress = data.address;
+          curOption.smartContractAddress = smartContractAddress;
+          console.log("successfully deployed contract at ", smartContractAddress);
+          console.log("contract info ", data);
+          console.log(curOption, ' see if saved');
+
+          //TODO(moezinia) call set cookie
+          //TODO(moezinia) call load unactivated options into dashboard
+          // 6) update list of 'my options' tab?
+        }
+      });
+  }
+}
+
+
 class callOption {
   constructor(maturityDate, ETHStrikePrice,
     premiumPrice, optionCreatorAddress,
     optionCreatorType, optionValue, offerExpiry) {
+    this.underlyingAmount = 1000000000000000000; //1 eth in wei
     this.maturityDate = maturityDate;
     this.ETHStrikePrice = ETHStrikePrice;
     this.premiumPrice = premiumPrice
     this.optionCreatorAddress = optionCreatorAddress;
     this.optionCreatorType = optionCreatorType;
-    this.optionValue = optionValue;
     // only allow fulfillemnt before certain datetime
     this.offerExpiry = offerExpiry;
+    this.optionType = false; //call option...
+    this.active = false;
   }
 
-  set setSmartContractAddress(address) {
+  setSmartContractAddress(address) {
     this.contractAddress = address;
   }
 
   // Getters
-  get contractAddress() {
+  contractAddress() {
     return this.contractAddress;
   }
 }
+
+
+// ---------------Action JS Here--------------------//
 
 $(document).ready(function() {
 
@@ -28,69 +109,58 @@ $(document).ready(function() {
     maturityDate = $("maturity").text();
     ETHStrikePrice = $("ETHStrikePrice").text();
     premiumPrice = $("premiumPrice").text();
-    optionCreatorType = "writer";//or holder TODO how to do this nicely in UI - create bid /create ask>?
-    // get tradingAccountAddress for this metamask user address!
-    optionCreatorAddress = web3.eth.contracts[0] //TODO correct? from metamask...
-
-
+    //buyer/holder = True, seller/writer = False.
+    optionCreatorType = true;//or writer TODO how to do this nicely in UI - create bid /create ask>?
     offerExpiry = $("offerExpiry").text();
-    optionValue = $("numberETH").text();
+
+    //TODO remove, just for testing
+    premiumPrice = 0.1;
+    offerExpiry = 100;
+    ETHStrikePrice = 2;
+    maturityDate = 100;
+    //TODO
 
 
+    // TODO unless use tradingaccount ?
+    getMetamaskAccount(function(optionCreatorAddress) {
 
 
-    const curOption = new Option(maturityDate, ETHStrikePrice,
-       premiumPrice, optionCreatorAddress, optionCreatorType,
-      optionValue, offerExpiry);
+      const curOption = new callOption(maturityDate, ETHStrikePrice,
+        premiumPrice, optionCreatorAddress, optionCreatorType,
+        offerExpiry);
 
-
-    $.ajax({
-      type: "POST",
-      url: "/api/deployOptionSmartContract",
-      curOption: curOption,
-      async: true,
-      error: (err) => {
-        console.log(err, "error from deployOptionSmartContract post");
-        return err;
-      },
-      success: (res) => {
-        console.log("result from deployOptionSmartContract post is", res);
-
-        console.log('writing to ipfs');
-        sendToIPFS(curOption);
-        // 4) upload the optin to ipfs
-        //
-        // 5) update list of unfulfilled options
-        //
-        // 6) update list of 'my options' tab
-        // update list of unfulfilled options
-
-        //update my options tab
-        return res;
-      }
+      // instantiateOptionSmartContract
+      const interfaceInstance = new createOptionSmartContract(curOption);
+      // smartContractAddress, optionSmartContractInstance = interfaceInstance.instantiateOptionSmartContract(optionObj);
+      smartContractAddress = interfaceInstance.instantiateOptionSmartContract(curOption);
     });
-
 
   });
 
 });
 
 
-function sendToIPFS(payload) {
-  $.ajax({
-    type: "POST",
-    url: "/api/appendToIPFS",
-    data: {
-      data: payload,
-      maturity: payload.maturity
-    },
-    error: function(err) {
-      console.log(err, "error from post");
-      return err;
-    },
-    success: function(res) {
-      console.log("result from post is", res);
-      return res;
-    }
-  });
-}
+
+
+
+
+
+
+// function sendToIPFS(payload) {
+//   $.ajax({
+//     type: "POST",
+//     url: "/api/appendToIPFS",
+//     data: {
+//       data: payload,
+//       maturity: payload.maturity
+//     },
+//     error: function(err) {
+//       console.log(err, "error from post");
+//       return err;
+//     },
+//     success: function(res) {
+//       // console.log("result from post is", res);
+//       return res;
+//     }
+//   });
+// }
