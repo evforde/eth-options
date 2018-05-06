@@ -1,6 +1,7 @@
 pragma solidity ^0.4.0;
+import "./usingOraclize.sol";
 
-contract Option {
+contract Option is usingOraclize{
   uint constant public underlyingAmount = 1000000000000000000; // 1 eth in wei
 
   address public optionBuyer;
@@ -13,6 +14,12 @@ contract Option {
   uint public premiumAmount;
   uint public cancellationTime;
   uint public maturityTime;
+
+  // balance used on exercise to verify strikePriceUSD 
+  uint public balance;
+  bytes32[] requests = new bytes32[](3);
+  uint[] ETHUSD = new uint[](3);
+
 
   // inactive -> creator can call cancel()
   // inactive -> active
@@ -74,39 +81,65 @@ contract Option {
     // TODO(eforde): verify not susceptible to reentry
   }
 
+  // complete exercise if after oracle returns and conditions are met
+  function __callback(bytes32 myid, string result, bytes proof) public {
+    if (msg.sender != oraclize_cbAddress()) revert();
+    if (myid == requests[0]) {
+      requests[0] = 0;
+      uint result0USD = 0; //TODO(magendanz) parse response from different APIs
+      ETHUSD[0] = result0USD;
 
+    } else if(myid == requests[1]) {
+      requests[1] = 0;
+      uint result1USD = 0; //TODO(magendanz) parse response from different APIs
+      ETHUSD[2] = result1USD;
+
+    } else if(myid == requests[2]) {
+      requests[2] = 0;
+      uint result2USD = 0; //TODO(magendanz) parse response from different APIs
+      ETHUSD[3] = result2USD;
+
+    } else revert();
+
+    // do we have all the exchange rates?
+    if (requests[0] == 0 && requests[1] == 0 && requests[2] == 0) {
+      uint currentETHPrice = (ETHUSD[0] + ETHUSD[1] + ETHUSD[2])/3; //TODO(magendanz) find better way to eliminate outlier
+      require(inTheMoney(currentETHPrice));
+      require(underlyingAmount <= address(this).balance); // should be equal!
+
+      // TODO(eforde): be careful about reentry here
+
+      //TODO(moezinia) send underlyingAmount*(currentETHPrice-strikePrice) to optionBuyer in WEI
+      uint holderSettlementAmout = ((currentETHPrice - strikePriceUSD)/currentETHPrice) * underlyingAmount;
+      optionBuyer.transfer(holderSettlementAmout);
+      //TODO(moezinia) send rest to seller (is amount of ether equivalent to strike price..) in WEI
+      uint writerSettlementAmount = (strikePriceUSD/currentETHPrice) * underlyingAmount;
+      require(writerSettlementAmount == address(this).balance);
+      selfdestruct(optionSeller); // less gass
+
+      // TODO(eforde: kill contract
+    }
+  }
+
+  // initialize exercise
   function exercise(uint currentETHPrice) public {
-    // TODO(magendanz) discuss inability to decentralize because we are cheap (no oracle),
-    // and there is only one USD-ETH contract API on the blockchain and we don't want to
-    // create a dependency (FiatContract)
-    // TODO(magendanz) do we want some sort of cryptographic authentication that the server
-    // is the only one making this function call?
+    //TODO(magendanz) can seller exercise?
     require(msg.sender == optionBuyer);
     require(block.timestamp < maturityTime); // TODO(eforde): otherwise expire
     require(optionType == false);
-    require(inTheMoney(currentETHPrice));
 
-    require(underlyingAmount <= address(this).balance); // should be equal!
-
-    // TODO(eforde): be careful about reentry here
-
-    //TODO(moezinia) send underlyingAmount*(currentETHPrice-strikePrice) to optionBuyer in WEI
-    uint holderSettlementAmout = ((currentETHPrice - strikePriceUSD)/currentETHPrice) * underlyingAmount;
-    optionBuyer.transfer(holderSettlementAmout);
-    //TODO(moezinia) send rest to seller (is amount of ether equivalent to strike price..) in WEI
-    uint writerSettlementAmount = (strikePriceUSD/currentETHPrice) * underlyingAmount;
-    require(writerSettlementAmount == address(this).balance);
-    selfdestruct(optionSeller); // less gass
-
-    // TODO(eforde: kill contract
+    // Need ETH in this.balance to request current ETH price. Return error string if insufficient funds
+    require((3*oraclize_getPrice("URL")) > address(this).balance); //TODO(magendanz) make sure this balance var is not used for anything else
+    requests[0] = oraclize_query("URL", "json(https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=USD).USD");
+    requests[1] = oraclize_query("URL", "json(https://api.kraken.com/0/public/Ticker?pair=ETHUSD).result.XETHZUSD.c.0");
+    requests[2] = oraclize_query("URL", "json(https://api.coinbase.com./v2/prices/ETH-USD/buy).data.amount");
   }
 
 
   function cancel() public {
     require(!isActive);
     // Assert sender created the contract
-    require((optionCreatorType && (msg.sender == optionBuyer)) ||
-            (!optionCreatorType && (msg.sender == optionSeller)));
+    require((optionCreatorType && (msg.sender == optionBuyer)) || (!optionCreatorType && (msg.sender == optionSeller)));
     selfdestruct(msg.sender);
   }
 
@@ -125,8 +158,7 @@ contract Option {
   function inTheMoney(uint curEthPrice) public view returns (bool) {
     // TODO(eforde): verify price is correct, or fetch price from on-chain
     // fiat contract
-    return (optionType && (curEthPrice < strikePriceUSD)) || // put
-           (!optionType && (curEthPrice > strikePriceUSD));  // call
+    return (optionType && (curEthPrice < strikePriceUSD)) || (!optionType && (curEthPrice > strikePriceUSD));  // pul || call
   }
 
 
