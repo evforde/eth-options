@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 // local dependencies
-const IPFS = require("../back-end-js/IPFS.js");
+// const IPFS = require("../back-end-js/IPFS.js");
 const auth = require("../back-end-js/metamask-auth.js");
 
 // GETs

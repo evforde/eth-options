@@ -36,7 +36,7 @@ $(document).ready(function() {
 
       const fallbackValues = {
         // data: bytecode,
-        data: OptionContractBinary,
+        // data: OptionContractBinary,
         from: this.optionObj.optionFulfillerAddress,
         gas: maxGasProvided,
         gasPrice: gasPrice,
@@ -45,31 +45,24 @@ $(document).ready(function() {
 
       const optionContract = web3.eth.contract(OptionContractABI, null, fallbackValues);
       const optionSmartContract = optionContract.at(optionObj.smartContractAddress);
-      //a = rick.isActive.call((err,res)=> {console.log(res)}); to check variable values
 
-      optionSmartContract.activateContract(optionFulfillerType, fallbackValues,
-        (err, res) => {
-          if (err) {
-            console.log(err);
-            alert("Error with contract activation", err);
-          }
-          else {
-            console.log(res);
-            txnHash = res.toString();
-            // now txn pending..
+      //TODO(moezinia) fix
+      optionSmartContract.activateContract(optionFulfillerType).send(fallbackValues,
+      (err, res) => {
+        console.log(res);
+      })
+      // .on("transactionHash", (txnHash) => console.log(txnHash));
 
-            const options = {
 
-              address: optionFulfillerAddress,
-
-            }
-
-            //TODO(efore, moezinia)
-            //wait for transaction to be mined.
-            web3.eth.filter(options, (filterErr, filterRes) => {
-              console.log(filterErr, ' si', filterRes);
-
-            });
+        // (err, res) => {
+        //   if (err) {
+        //     console.log(err);
+        //     alert("Error with contract activation", err);
+        //   }
+        //   else {
+        //     console.log(res);
+        //     txnHash = res.toString();
+        //     // now txn pending..
 
             // once txn mined, then get receipt to evaluate success of call....
 
@@ -93,10 +86,6 @@ $(document).ready(function() {
             //   }
             // });
 
-
-
-          }
-      });
     });
   });
 });
