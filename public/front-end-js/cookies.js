@@ -1,10 +1,4 @@
-// get cookies from user (using account address), to see traderType
-
-// get smart contract address of option
-
-// get option information
-
-
+// -------storing option Objects in browser cookie"
 
 function getCookie(cookieName="optionInfo") {
     var name = cookieName + "=";
@@ -46,8 +40,9 @@ function setBrowserCookie(optionObj) {
 
   // set cookie if does not exist
   if (getCookie("optionInfo") == "") {
-    cookieInfo = {optionInformation: new Array(optionObj)}
-    document.cookie = "optionInfo="+JSON.stringify(cookieInfo)+"; expires=Wed, 01 Jan 2020 00:00:00 UTC; path=/dashboard;";
+    cookieInfo = {optionInformation: new Array(optionObj)};
+    //TODO(moezinia) change expiration to optionObj.cancellationTime
+    document.cookie = "optionInfo="+JSON.stringify(cookieInfo)+"; expires=Wed, 01 Jan 2030 00:00:00 UTC; path=/dashboard;";
   }
   // append another option to cookie
   else {

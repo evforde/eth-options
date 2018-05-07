@@ -2,7 +2,7 @@ function querySC(scAddress) {
 
   const optionContract = web3.eth.contract(OptionContractABI, null);
   const optionSmartContract = optionContract.at(scAddress);
-  const curOption = {};
+  var curOption = {};
   isActive = optionSmartContract.isActive.call(
     (err, res) => {
       if (err) {
@@ -29,13 +29,33 @@ function querySC(scAddress) {
 // uint public maturityTime;
 // bool public isActive;
 
+
+  // return some object with all these values..
+}
+
+//TODO(moezinia)
+function queryOrderBook(scAddress) {
+  const orderBookContract = web3.eth.contract(OrderBookContractABI, null).at(scAddress);
+  // const curOption = {};
+  const inactiveOptionInfo = [];
+  inActiveOptions = orderBookContract.allOptions.call(
+    (err, res) => {
+      if (err) {
+        console.log("error retrieving from ", scAddress);
+      }
+      else {
+        //TODO get res....
+      }
+    }
+  );
+  return inactiveOptionInfo;
 }
 
 //-----------main function------------//
-function getAllInactiveOptionInfo() {
-  scAddresses = //TODO(moezinia) from order book smart contract
-
-  inactiveOptionInfo = getOptionInfo(scAddresses);
+function getAllInactiveOptionInfo(maturityDate, strikePriceUSD) {
+  //TODO(moezinia) from order book smart contract with this maturity and strike...
+  scAddress = "0xORDERBOOK!";
+  inactiveOptionInfo = queryOrderBook(scAddress);
   return inactiveOptionInfo;
 }
 
