@@ -27,22 +27,22 @@ function createNewTradingAccount(account, callback) {
   //   gas: 1000,
   //   gasPrice: "1"
   // })
-  // .on("error", function(error){ 
+  // .on("error", function(error){
   //   console.log("err", error);
   //  })
-  // .on("transactionHash", function(transactionHash){ 
+  // .on("transactionHash", function(transactionHash){
   //   console.log("tx", transactionHash);
   //  })
   // .on("receipt", function(receipt){
   //    console.log("receipt", receipt.contractAddress) // contains the new contract address
   // })
-  // .on("confirmation", function(confirmationNumber, receipt){ 
+  // .on("confirmation", function(confirmationNumber, receipt){
   //   console.log("conf", confirmationNumber, receipt) // contains the new contract address
   //  })
   // .then(function(newContractInstance) {
   //     console.log("instance", newContractInstance.options.address) // instance with the new contract address
   // });
-  
+
 }
 
 module.exports = {

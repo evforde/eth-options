@@ -36,7 +36,7 @@ $(document).ready(function() {
 
       const fallbackValues = {
         // data: bytecode,
-        data: OptionContractBinary,
+        // data: OptionContractBinary,
         from: this.optionObj.optionFulfillerAddress,
         gas: maxGasProvided,
         gasPrice: gasPrice,
@@ -45,8 +45,6 @@ $(document).ready(function() {
 
       const optionContract = web3.eth.contract(OptionContractABI, null, fallbackValues);
       const optionSmartContract = optionContract.at(optionObj.smartContractAddress);
-      //a = rick.isActive.call((err,res)=> {console.log(res)}); to check variable values
-
       optionSmartContract.activateContract(optionFulfillerType, fallbackValues,
         (err, res) => {
           if (err) {
@@ -54,49 +52,67 @@ $(document).ready(function() {
             alert("Error with contract activation", err);
           }
           else {
-            console.log(res);
             txnHash = res.toString();
+            console.log(txnHash);
+            // txnHash = "0xce425ef72015748509d2914c3e1b6ad742bc3533aa921a1ba0f14602314b7c7d";// successful txn..
             // now txn pending..
-
-            const options = {
-
-              address: optionFulfillerAddress,
-
-            }
-
-            //TODO(efore, moezinia)
-            //wait for transaction to be mined.
-            web3.eth.filter(options, (filterErr, filterRes) => {
-              console.log(filterErr, ' si', filterRes);
-
+            // activateContract(optionSmartContract, optionFulfillerType, fallbackValues);
+            prom = getTransactionReceiptMined(txnHash, 600, 4);
+            prom.then(function(receipt) {
+              if (receipt.status == "0x1") {
+                alert("Option Activated!");
+                optionObj.active = true;
+                console.log(optionObj.contractAddress, 'bye');
+                setBrowserCookie(optionObj);
+              }
+              else {
+                console.log("no way to debug on testnet");
+                alert("Option Unable to be Activated. Please check Option Details");
+              }
+            }, function(error) {
+              alert("Option Unable to be Activated. Please check Option Details");
+              console.log(error);
             });
-
-            // once txn mined, then get receipt to evaluate success of call....
-
-            // web3.eth.getTransactionReceipt(txnHash, (txnErr, txnRes) => {
-            //   console.log('givign ', txnErr, txnRes);
-            //   if (txnErr) {
-            //     console.log("error getting txn receipt");
-            //   }
-            //   else {
-            //     console.log(txnRes);
-            //     console.log(txnRes.status);
-            //     if (txnRes.status == "0x1") {
-            //       optionObj.active = true;
-            //       //TODO(moezinia) set cookie with smart contract and account address
-            //       //or just optionObj?
-            //     }
-            //     if (txnRes.status == "0x0") {
-            //       console.log("can not activate contract");
-            //       alert("No way to debug until using geth");
-            //     }
-            //   }
-            // });
-
-
-
           }
+        });
       });
     });
   });
-});
+
+
+function getTransactionReceiptMined(txHash, interval, blockLimit) {
+  var count = 0;
+  var blocks = blockLimit;
+
+  const transactionReceiptAsync = function(resolve, reject) {
+      if (count > blocks) {
+        reject(blocks + " blocks mined but no txn receipt!");
+        // reject('Contract transaction couldn\'t be found after ', blocks, ' blocks');
+        return;
+      }
+
+      web3.eth.getTransactionReceipt(txHash, (error, receipt) => {
+          if (error) {
+            console.log("promise error", error);
+            reject(error);
+          } else if (receipt == null) {
+              setTimeout(
+                  () => transactionReceiptAsync(resolve, reject),
+                  interval ? interval : 500);
+          } else {
+              resolve(receipt);
+          }
+      });
+
+      count++;
+  };
+
+  if (Array.isArray(txHash)) {
+      return Promise.all(txHash.map(
+          oneTxHash => web3.eth.getTransactionReceiptMined(oneTxHash, interval)));
+  } else if (typeof txHash === "string") {
+      return new Promise(transactionReceiptAsync);
+  } else {
+      throw new Error("Invalid Type: " + txHash);
+  }
+};

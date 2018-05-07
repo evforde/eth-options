@@ -1,7 +1,15 @@
-// TO display user specific activated options
+// ----fetches all options in user's cookies-------
 
+function loadUserOptions() {
 
-// get user. get users cookies. find smart contract address
+  // gets list of option Objects
+  userOptionInfo = getUserOptionInfo();
+  for (var i = 0; i < userOptionInfo.length; i++) {
+    opt = userOptionInfo[i];
 
+    //TODO(moezinia) DISPLAY SOMEWHERE!!!
+    //$.("myoptionsRow") or whatever... in dashboard.ejs
+    // only display.. if active, < maturity time
+  }
 
-// query smart contract address for infosssss
+}

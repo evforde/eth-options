@@ -61,10 +61,9 @@ class createOptionSmartContract {
         if (data.address) {
           smartContractAddress = data.address;
           curOption.smartContractAddress = smartContractAddress;
-          console.log("successfully deployed contract at ", smartContractAddress);
-          console.log("contract info ", data);
-          console.log(curOption, ' see if saved');
-
+          // console.log("successfully deployed contract at ", smartContractAddress);
+          // console.log("contract info ", data);
+          console.log(JSON.stringify(curOption), ' see if saved');
           //TODO(moezinia) call set cookie
           //TODO(moezinia) call load unactivated options into dashboard
           // 6) update list of 'my options' tab?
