@@ -96,18 +96,16 @@ contract Option is usingOraclize{
     if (i != conversion_apis.length) revert(); // callback was not from a request
 
     // do we have all the exchange rates?
-    bool recieved = true;
+    uint recieved = 0;
+    uint threshold = conversion_apis.length - 1; //TODO(magendanz) set as static and global
+    uint currentETHPrice = 0; //TODO(magendanz) find better way to eliminate outlier
     for (uint j = 0; j < conversion_apis.length; j++) {
-      if (requests[j] != 0) {
-        recieved = false;
-        break;
+      if (requests[j] == 0) {
+        recieved++;
+        currentETHPrice += ETHUSD[j];
       }
     }
-    if (recieved) { //TODO(magendanz) this relies on getting a response from all requests
-      uint currentETHPrice = 0; //TODO(magendanz) find better way to eliminate outlier
-      for (uint k = 0; j < conversion_apis.length; j++) {
-        currentETHPrice += ETHUSD[k];
-      }
+    if (recieved >= threshold) {
       currentETHPrice /= conversion_apis.length;
       require(inTheMoney(currentETHPrice));
       require(underlyingAmount <= address(this).balance); // should be equal!
