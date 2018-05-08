@@ -17,6 +17,7 @@ contract Option is usingOraclize{
 
   // balance used on exercise to verify strikePriceUSD 
   uint public balance;
+  string[] conversion_apis = ["json(https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD).USD", "json(https://api.kraken.com/0/public/Ticker?pair=ETHUSD).result.XETHZUSD.c.0", "json(https://api.coinbase.com./v2/prices/ETH-USD/buy).data.amount"];
   bytes32[] requests = new bytes32[](3);
   uint[] ETHUSD = new uint[](3);
 
@@ -84,26 +85,30 @@ contract Option is usingOraclize{
   // complete exercise if after oracle returns and conditions are met
   function __callback(bytes32 myid, string result, bytes proof) public {
     if (msg.sender != oraclize_cbAddress()) revert();
-    if (myid == requests[0]) {
-      requests[0] = 0;
-      uint result0USD = 0; //TODO(magendanz) parse response from different APIs
-      ETHUSD[0] = result0USD;
-
-    } else if(myid == requests[1]) {
-      requests[1] = 0;
-      uint result1USD = 0; //TODO(magendanz) parse response from different APIs
-      ETHUSD[2] = result1USD;
-
-    } else if(myid == requests[2]) {
-      requests[2] = 0;
-      uint result2USD = 0; //TODO(magendanz) parse response from different APIs
-      ETHUSD[3] = result2USD;
-
-    } else revert();
+    for (uint i = 0; i < conversion_apis.length; i++) {
+      if (myid == requests[0]) {
+        requests[i] = 0;
+        uint result0USD = 0; //TODO(magendanz) convert result to uint
+        ETHUSD[i] = result0USD;
+        break;
+      }
+    }
+    if (i != conversion_apis.length) revert(); // callback was not from a request
 
     // do we have all the exchange rates?
-    if (requests[0] == 0 && requests[1] == 0 && requests[2] == 0) {
-      uint currentETHPrice = (ETHUSD[0] + ETHUSD[1] + ETHUSD[2])/3; //TODO(magendanz) find better way to eliminate outlier
+    bool recieved = true;
+    for (uint j = 0; j < conversion_apis.length; j++) {
+      if (requests[j] != 0) {
+        recieved = false;
+        break;
+      }
+    }
+    if (recieved) { //TODO(magendanz) this relies on getting a response from all requests
+      uint currentETHPrice = 0; //TODO(magendanz) find better way to eliminate outlier
+      for (uint k = 0; j < conversion_apis.length; j++) {
+        currentETHPrice += ETHUSD[k];
+      }
+      currentETHPrice /= conversion_apis.length;
       require(inTheMoney(currentETHPrice));
       require(underlyingAmount <= address(this).balance); // should be equal!
 
@@ -122,17 +127,17 @@ contract Option is usingOraclize{
   }
 
   // initialize exercise
-  function exercise(uint currentETHPrice) public {
+  function exercise() public {
     //TODO(magendanz) can seller exercise?
     require(msg.sender == optionBuyer);
     require(block.timestamp < maturityTime); // TODO(eforde): otherwise expire
     require(optionType == false);
 
     // Need ETH in this.balance to request current ETH price. Return error string if insufficient funds
-    require((3*oraclize_getPrice("URL")) > address(this).balance); //TODO(magendanz) make sure this balance var is not used for anything else
-    requests[0] = oraclize_query("URL", "json(https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=USD).USD");
-    requests[1] = oraclize_query("URL", "json(https://api.kraken.com/0/public/Ticker?pair=ETHUSD).result.XETHZUSD.c.0");
-    requests[2] = oraclize_query("URL", "json(https://api.coinbase.com./v2/prices/ETH-USD/buy).data.amount");
+    require((conversion_apis.length * oraclize_getPrice("URL")) > address(this).balance); //TODO(magendanz) make sure this balance var is not used for anything else
+    for (uint i = 0; i < conversion_apis.length; i++) {
+      requests[i] = oraclize_query("URL", conversion_apis[i]);
+    }
   }
 
 
