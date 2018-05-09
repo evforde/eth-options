@@ -1,6 +1,3 @@
-
-
-
 //---------------Activate/Enter Into Option Contract----------------------//
 
 $(document).ready(function() {
@@ -10,17 +7,21 @@ $(document).ready(function() {
 
     //TODO(moezinia) no object, just take from UI
     optionObj = $("optionObject"); // use ejs (res.render(optionObj) var client side)
+    const testOptionObj = {"underlyingAmount":1000000000000000000,
+    "maturityDate":9999999999999,
+    "ETHStrikePrice":100,
+    "premiumPrice":1, //eth TODO change to 0.69 to differentiate prem vs underying
+    "optionCreatorAddress":"0x3ce56307bb3dde4d831170b40f9148b934a778e9",
+    "optionCreatorType":false,
+    "optionType":false,
+    "active":false,
+    "smartContractAddress":"0x6cd5e0c887d15e012e5c06ff4813397ef662d19f"};
     optionObj = testOptionObj;
+
+
     contractAddress = optionObj.contractAddress;
     optionFulfillerType = !optionObj.optionCreatorType;
 
-
-    //TODO remove, just for testing
-    premiumPrice = 0.1;
-    offerExpiry = 100;
-    ETHStrikePrice = 2;
-    maturityDate = 100;
-    //TODO
 
     // TODO unless use tradingaccount ?
     getMetamaskAccount(function(optionFulfillerAddress) {
@@ -57,13 +58,14 @@ $(document).ready(function() {
             // txnHash = "0xce425ef72015748509d2914c3e1b6ad742bc3533aa921a1ba0f14602314b7c7d";// successful txn..
             // now txn pending..
             // activateContract(optionSmartContract, optionFulfillerType, fallbackValues);
-            prom = getTransactionReceiptMined(txnHash, 600, 4);
+            prom = getTransactionReceiptMined(txnHash, 2000, 95);
             prom.then(function(receipt) {
               if (receipt.status == "0x1") {
                 alert("Option Activated!");
                 optionObj.active = true;
                 console.log(optionObj.contractAddress, 'bye');
                 setBrowserCookie(optionObj);
+                //TODO(moezinia) also need to remove from order book contract...
               }
               else {
                 console.log("no way to debug on testnet");

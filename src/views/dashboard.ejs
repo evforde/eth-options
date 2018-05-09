@@ -15,6 +15,7 @@
   <script src="/static/front-end-js/query-option-smart-contract.js"></script>
   <script src="/static/front-end-js/load-user-options.js"></script>
   <script src="/static/front-end-js/activate-option-contract.js"></script>
+  <script src="/static/front-end-js/eth-price.js"></script>
   <link rel="stylesheet" type="text/css" href="/static/css/shared.css">
   <script>
     const TradingAccountABI = JSON.parse('<%= tradingAccountABI %>'.replace(/&#34;/g, "\"").slice(1, -1));
@@ -22,7 +23,6 @@
     const TradingAccountBinary = decodeURIComponent('<%= tradingAccountBinary %>');
     const OptionContractABI = JSON.parse('<%= optionContractABI %>'.replace(/&#34;/g, "\"").slice(1, -1));
     const OptionContractBinary = decodeURIComponent('<%= optionContractBinary %>');
-    const testOptionObj = {"underlyingAmount":1000000000000000000,"maturityDate":100,"ETHStrikePrice":2,"premiumPrice":0.1,"optionCreatorAddress":"0x3ce56307bb3dde4d831170b40f9148b934a778e9","optionCreatorType":true,"optionType":false,"active":false, "contractAddress": "0xc4563fdd3e7dc5d7e0d0277f586cc1fb8d3b5d83"};
   </script>
 </head>
 
@@ -57,6 +57,10 @@
         <div class="acceptOptionRow">
           <div id="optionObject">option info rendered here</div>
           <button id="acceptOptionOffer">Accept Bid</button>
+        </div>
+
+        <div class="exerciseOption">
+          <button id="exerciseOptionOffer">Exercise!</button>
         </div>
 
 

@@ -6,8 +6,8 @@ class createOptionSmartContract {
   constructor(_optionObj) {
     this.optionObj = _optionObj;
     //TODO(moezinia) optimize gas and price..
-    this.maxGasProvided = 1000000; //gas limit max 4665264   860444 used for create/deposit!
-    this.gasPrice = "20000000000"; // 20 Gwei (next few blocks ~ few seconds)
+    this.maxGasProvided = 4000000; //gas limit max 4665264   860444 used for create/deposit!
+    this.gasPrice = "15000000000"; // 15 Gwei (next few blocks ~ few seconds)
     this.valueToSend = 0;
   }
 
@@ -40,14 +40,13 @@ class createOptionSmartContract {
     }
     const optionContract = web3.eth.contract(OptionContractABI, null, fallbackValues);
     this.optionContract = optionContract;
-
-    const constructorArgs = [this.optionObj.type, this.optionObj.ETHStrikePrice,
+    const argz = [this.optionObj.type, this.optionObj.ETHStrikePrice,
       this.optionObj.maturityDate, this.optionObj.offerExpiry,
       this.optionObj.premiumPrice, this.optionObj.optionCreatorType];
 
-    const optionSmartContract = optionContract.new(constructorArgs[0],
-      constructorArgs[1], constructorArgs[2], constructorArgs[3],
-      constructorArgs[4], constructorArgs[5],
+    const optionSmartContract = optionContract.new(argz[0],
+      argz[1], argz[2], argz[3],
+      argz[4], argz[5],
       fallbackValues, function(err, data) {
         // callback fires multiple times...
         if (err) {
@@ -109,15 +108,16 @@ $(document).ready(function() {
     ETHStrikePrice = $("ETHStrikePrice").text();
     premiumPrice = $("premiumPrice").text();
     //buyer/holder = True, seller/writer = False.
-    optionCreatorType = true;//or writer TODO how to do this nicely in UI - create bid /create ask>?
+    optionCreatorType = false;// TODO how to do this nicely in UI - create bid /create ask>?
     offerExpiry = $("offerExpiry").text();
 
     //TODO remove, just for testing
-    premiumPrice = 0.1;
-    offerExpiry = 100;
-    ETHStrikePrice = 2;
-    maturityDate = 100;
+    premiumPrice = 1;
+    offerExpiry = 99999999999999999;
+    ETHStrikePrice = 100;
+    maturityDate = 9999999999999;
     //TODO
+
 
 
     // TODO unless use tradingaccount ?
@@ -131,7 +131,7 @@ $(document).ready(function() {
       // instantiateOptionSmartContract
       const interfaceInstance = new createOptionSmartContract(curOption);
       // smartContractAddress, optionSmartContractInstance = interfaceInstance.instantiateOptionSmartContract(optionObj);
-      smartContractAddress = interfaceInstance.instantiateOptionSmartContract(curOption);
+      interfaceInstance.instantiateOptionSmartContract(curOption);
     });
 
   });

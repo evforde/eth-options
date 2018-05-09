@@ -11,17 +11,19 @@ contract Option is usingOraclize{
   bool public optionCreatorType;   // buyer = True, seller = False.
 
   uint public strikePriceUSD;
-  uint public premiumAmount;
+  uint public premiumAmount; // eth - wei in constructor
   uint public cancellationTime;
   uint public maturityTime;
 
   // balance used on exercise to verify strikePriceUSD
 
-  string[] conversion_apis = ["json(https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD).USD"]
-  /* string[] conversion_apis = ["json(https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD).USD", "json(https://api.kraken.com/0/public/Ticker?pair=ETHUSD).result.XETHZUSD.c.0", "json(https://api.coinbase.com./v2/prices/ETH-USD/buy).data.amount"]; */
+  /* string[] conversion_apis = ["json(https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD).USD"] */
+  /* string[] conversion_apis = ["json(https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD).USD", "json(https://api.kraken.com/0/public/Ticker?pair=currentETHPrice).result.XETHZUSD.c.0", "json(https://api.coinbase.com./v2/prices/ETH-USD/buy).data.amount"]; */
   // TODO add back other 2 api's
-  bytes32[] requests = new bytes32[](1);
-  uint[] ETHUSD = new uint[](1);
+  string private ETH_PRICE_URL = "json(https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD).USD";
+  mapping(bytes32 => bool) public validIds;
+  uint public currentETHPrice;
+  /* uint[] currentETHPrice = new uint[](1); */
 
 
   // inactive -> creator can call cancel()
@@ -37,6 +39,7 @@ contract Option is usingOraclize{
   // events
 
   event LogTransferMade(address sender, address receiver, uint amount);
+  event LogNewOraclizeQuery(string description);
 
 
   constructor(bool _optionType, uint _strikePriceUSD,
@@ -59,7 +62,7 @@ contract Option is usingOraclize{
     optionType = _optionType;
     strikePriceUSD = _strikePriceUSD;
     maturityTime = _maturityTime;
-    premiumAmount = _premiumAmount;
+    premiumAmount = (_premiumAmount*1000000000000000000);
     cancellationTime = _cancellationTime;
 
     isActive = false;
@@ -87,13 +90,34 @@ contract Option is usingOraclize{
   }
 
   // complete exercise if after oracle returns and conditions are met
-  function __callback(bytes32 myid, string result, bytes proof) public {
-    /* if (msg.sender != oraclize_cbAddress()) revert(); TODO add for security*/
+  function __callback(bytes32 _myid, string _result) public {
+    emit LogNewOraclizeQuery(_result);
+    if (!validIds[_myid]) revert();
+    currentETHPrice = parseInt(_result, 2);
+
+    require(inTheMoney(currentETHPrice));
+    /* require(underlyingAmount <= address(this).balance); // should be equal! */
+
+    uint holderSettlementAmout = ((currentETHPrice - strikePriceUSD)/currentETHPrice) * underlyingAmount;
+    optionBuyer.transfer(holderSettlementAmout);
+    //TODO(moezinia) send rest to seller (is amount of ether equivalent to strike price..) in WEI
+    uint writerSettlementAmount = (strikePriceUSD/currentETHPrice) * underlyingAmount;
+    /* require(writerSettlementAmount == address(this).balance); */
+    /* selfdestruct(optionSeller); */
+    optionSeller.transfer(writerSettlementAmount);
+    //TODO(moezinia) delete line add back
+    delete validIds[_myid];
+    return;
+
+
+
+    /* require(msg.sender == oraclize_cbAddress());
     for (uint i = 0; i < conversion_apis.length; i++) {
-      if (myid == requests[0]) {
-        requests[i] = 0;
+      if (!)
+      if (validIds[myid]) {
+        validIds[i] = 0;
         uint result0USD = 0; //TODO(magendanz) convert result to uint
-        ETHUSD[i] = result0USD;
+        currentETHPrice[i] = result0USD;
         break;
       }
     }
@@ -105,7 +129,7 @@ contract Option is usingOraclize{
     for (uint j = 0; j < conversion_apis.length; j++) {
       if (requests[j] == 0) {
         recieved++;
-        currentETHPrice += ETHUSD[j];
+        currentETHPrice += currentETHPrice[j];
       }
     }
     if (recieved >= threshold) {
@@ -116,20 +140,24 @@ contract Option is usingOraclize{
       // TODO(eforde): be careful about reentry here
 
       //TODO(moezinia) send underlyingAmount*(currentETHPrice-strikePrice) to optionBuyer in WEI
-      uint holderSettlementAmout = ((currentETHPrice - strikePriceUSD)/currentETHPrice) * underlyingAmount;
-      optionBuyer.transfer(holderSettlementAmout);
+      //uint holderSettlementAmout = ((currentETHPrice - strikePriceUSD)/currentETHPrice) * underlyingAmount;
+      //optionBuyer.transfer(holderSettlementAmout);
       //TODO(moezinia) send rest to seller (is amount of ether equivalent to strike price..) in WEI
-      uint writerSettlementAmount = (strikePriceUSD/currentETHPrice) * underlyingAmount;
+      //uint writerSettlementAmount = (strikePriceUSD/currentETHPrice) * underlyingAmount;
       /* require(writerSettlementAmount == address(this).balance); */
       /* selfdestruct(optionSeller); */
-      optionSeller.transfer(writerSettlementAmount);
-
+      //optionSeller.transfer(writerSettlementAmount);
+      //TODO(moezinia) delete line add back
+      //delete validIds[myid];
       // TODO(eforde: kill contract
-    }
+    //} */
   }
 
+  //TODO(moezinia) can oraclize.setCustomGasPrice -> 10Gwei or something
   function exerciseCost() public returns (uint exerciseGasCost) {
-    exerciseGasCost = (conversion_apis.length * oraclize_getPrice("URL"));
+    /* exerciseGasCost = (conversion_apis.length * oraclize_getPrice("URL")); */
+    exerciseGasCost = oraclize_getPrice("URL");
+    emit LogNewOraclizeQuery(uint2str(exerciseGasCost));
     return exerciseGasCost;
   }
 
@@ -138,12 +166,14 @@ contract Option is usingOraclize{
     require(msg.sender == optionBuyer);
     require(block.timestamp < maturityTime); // TODO(eforde): otherwise expire
     require(optionType == false); // has to be call for now
-    require((conversion_apis.length * oraclize_getPrice("URL")) <= msg.value);
-    for (uint i = 0; i < conversion_apis.length; i++) {
-      requests[i] = oraclize_query("URL", conversion_apis[i]);
-    }
-
-
+    /* require((conversion_apis.length * oraclize_getPrice("URL")) <= msg.value); */
+    require(msg.value >oraclize_getPrice("URL"));
+    bytes32 queryId = oraclize_query("URL", ETH_PRICE_URL);
+    validIds[queryId] = true;
+    /* for (uint i = 0; i < conversion_apis.length; i++) {
+      bytes32 queryID = oraclize_query("URL", conversion_apis[i]);
+      validIds[queryID] = true;
+    } */
 
   }
 
