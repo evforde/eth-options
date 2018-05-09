@@ -15,7 +15,7 @@ $(document).ready(function() {
     "optionCreatorType":false,
     "optionType":false,
     "active":false,
-    "smartContractAddress":"0x6cd5e0c887d15e012e5c06ff4813397ef662d19f"};
+    "smartContractAddress":"0xACf81CD62c1ac1663c8E136f490C22D7dFA0Da0a"};
     optionObj = testOptionObj;
 
 
@@ -46,6 +46,7 @@ $(document).ready(function() {
 
       const optionContract = web3.eth.contract(OptionContractABI, null, fallbackValues);
       const optionSmartContract = optionContract.at(optionObj.smartContractAddress);
+
       optionSmartContract.activateContract(optionFulfillerType, fallbackValues,
         (err, res) => {
           if (err) {
@@ -77,6 +78,8 @@ $(document).ready(function() {
             });
           }
         });
+
+
       });
     });
   });

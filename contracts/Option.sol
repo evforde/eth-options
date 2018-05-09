@@ -33,14 +33,11 @@ contract Option is usingOraclize{
   bool public isActive;
 
   // BIG TODO(eforde): block.timestamp not secure...
-  // BIG TODO(eforde): block.timestamp not secure...
-  // BIG TODO(eforde): block.timestamp not secure...
 
   // events
 
   event LogTransferMade(address sender, address receiver, uint amount);
   event LogNewOraclizeQuery(string description);
-
 
   constructor(bool _optionType, uint _strikePriceUSD,
     uint _maturityTime, uint _cancellationTime,
@@ -86,6 +83,8 @@ contract Option is usingOraclize{
     }
     isActive = true;
     optionSeller.transfer(premiumAmount);
+    emit LogTransferMade(optionBuyer, optionSeller, premiumAmount);
+
     // TODO(eforde): verify not susceptible to reentry
   }
 
@@ -100,6 +99,7 @@ contract Option is usingOraclize{
 
     uint holderSettlementAmout = ((currentETHPrice - strikePriceUSD)/currentETHPrice) * underlyingAmount;
     optionBuyer.transfer(holderSettlementAmout);
+
     //TODO(moezinia) send rest to seller (is amount of ether equivalent to strike price..) in WEI
     uint writerSettlementAmount = (strikePriceUSD/currentETHPrice) * underlyingAmount;
     /* require(writerSettlementAmount == address(this).balance); */
@@ -107,9 +107,8 @@ contract Option is usingOraclize{
     optionSeller.transfer(writerSettlementAmount);
     //TODO(moezinia) delete line add back
     delete validIds[_myid];
-    return;
-
-
+    isActive = false;
+    emit LogNewOraclizeQuery("exercised baby!");
 
     /* require(msg.sender == oraclize_cbAddress());
     for (uint i = 0; i < conversion_apis.length; i++) {
@@ -174,7 +173,27 @@ contract Option is usingOraclize{
       bytes32 queryID = oraclize_query("URL", conversion_apis[i]);
       validIds[queryID] = true;
     } */
+  }
 
+  function exerciseExternalPrice (uint _currentETHPrice) public {
+    currentETHPrice = _currentETHPrice;
+    require(msg.sender == optionBuyer);
+    require(block.timestamp < maturityTime);
+    require(optionType == false);
+    require(inTheMoney(currentETHPrice));
+
+    //TODO(moezinia) NO DIVISION!!!
+    uint writerSettlementAmount = (strikePriceUSD * underlyingAmount)/currentETHPrice;
+    optionSeller.transfer(writerSettlementAmount);
+    emit LogTransferMade(address(this), optionSeller, writerSettlementAmount);
+
+
+    /* uint holderSettlementAmout = ((currentETHPrice - strikePriceUSD)/currentETHPrice) * underlyingAmount; */
+    uint holderSettlementAmout = address(this).balance; // whatever is left over!
+    optionBuyer.transfer(holderSettlementAmout);
+    emit LogTransferMade(address(this), optionBuyer, holderSettlementAmout);
+
+    isActive = false;
   }
 
 
@@ -197,10 +216,10 @@ contract Option is usingOraclize{
   // ===== Utility functions ===== //
 
 
-  function inTheMoney(uint curEthPrice) public view returns (bool) {
+  function inTheMoney(uint _currentETHPrice) public view returns (bool) {
     // TODO(eforde): verify price is correct, or fetch price from on-chain
     // fiat contract
-    return (optionType && (curEthPrice < strikePriceUSD)) || (!optionType && (curEthPrice > strikePriceUSD));  // pul || call
+    return (optionType && (_currentETHPrice < strikePriceUSD)) || (!optionType && (_currentETHPrice > strikePriceUSD));  // pul || call
   }
 
 

@@ -7,7 +7,7 @@ class createOptionSmartContract {
     this.optionObj = _optionObj;
     //TODO(moezinia) optimize gas and price..
     this.maxGasProvided = 4000000; //gas limit max 4665264   860444 used for create/deposit!
-    this.gasPrice = "15000000000"; // 15 Gwei (next few blocks ~ few seconds)
+    this.gasPrice = "25000000000"; // 25 Gwei (next few blocks ~ few seconds)
     this.valueToSend = 0;
   }
 
@@ -79,6 +79,7 @@ class callOption {
     this.underlyingAmount = 1000000000000000000; //1 eth in wei
     this.maturityDate = maturityDate;
     this.ETHStrikePrice = ETHStrikePrice;
+    //TODO(moezinia) this can only be integer in solidity contstrcutor. figure out how to do float
     this.premiumPrice = premiumPrice
     this.optionCreatorAddress = optionCreatorAddress;
     this.optionCreatorType = optionCreatorType;
