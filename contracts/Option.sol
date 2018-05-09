@@ -15,11 +15,13 @@ contract Option is usingOraclize{
   uint public cancellationTime;
   uint public maturityTime;
 
-  // balance used on exercise to verify strikePriceUSD 
-  uint public balance;
-  string[] conversion_apis = ["json(https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD).USD", "json(https://api.kraken.com/0/public/Ticker?pair=ETHUSD).result.XETHZUSD.c.0", "json(https://api.coinbase.com./v2/prices/ETH-USD/buy).data.amount"];
-  bytes32[] requests = new bytes32[](3);
-  uint[] ETHUSD = new uint[](3);
+  // balance used on exercise to verify strikePriceUSD
+
+  string[] conversion_apis = ["json(https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD).USD"]
+  /* string[] conversion_apis = ["json(https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD).USD", "json(https://api.kraken.com/0/public/Ticker?pair=ETHUSD).result.XETHZUSD.c.0", "json(https://api.coinbase.com./v2/prices/ETH-USD/buy).data.amount"]; */
+  // TODO add back other 2 api's
+  bytes32[] requests = new bytes32[](1);
+  uint[] ETHUSD = new uint[](1);
 
 
   // inactive -> creator can call cancel()
@@ -44,10 +46,12 @@ contract Option is usingOraclize{
     // set optionBuyer/optionSeller based on optionCreatorType
     if (_traderType) {
       require(msg.value == premiumAmount);
+      require(address(this).balance == premiumAmount);
       optionBuyer = msg.sender;
     }
     else {
       require(msg.value == underlyingAmount);
+      require(address(this).balance == underlyingAmount);
       optionSeller = msg.sender;
     }
 
@@ -66,13 +70,13 @@ contract Option is usingOraclize{
     require(traderType == !optionCreatorType);
     require(block.timestamp < cancellationTime); // TODO(eforde): otherwise cancel
     if (traderType) { // buyer
-      require(address(this).balance == underlyingAmount);
+      require(address(this).balance > underlyingAmount);
       require(msg.value == premiumAmount);
       require(optionSeller != 0);
       optionBuyer = msg.sender;
     }
     else { // seller
-      require(address(this).balance == premiumAmount);
+      require(address(this).balance > premiumAmount);
       require(msg.value == underlyingAmount);
       require(optionBuyer != 0);
       optionSeller = msg.sender;
@@ -84,7 +88,7 @@ contract Option is usingOraclize{
 
   // complete exercise if after oracle returns and conditions are met
   function __callback(bytes32 myid, string result, bytes proof) public {
-    if (msg.sender != oraclize_cbAddress()) revert();
+    /* if (msg.sender != oraclize_cbAddress()) revert(); TODO add for security*/
     for (uint i = 0; i < conversion_apis.length; i++) {
       if (myid == requests[0]) {
         requests[i] = 0;
@@ -95,7 +99,6 @@ contract Option is usingOraclize{
     }
     if (i != conversion_apis.length) revert(); // callback was not from a request
 
-    // do we have all the exchange rates?
     uint recieved = 0;
     uint threshold = conversion_apis.length - 1; //TODO(magendanz) set as static and global
     uint currentETHPrice = 0; //TODO(magendanz) find better way to eliminate outlier
@@ -108,7 +111,7 @@ contract Option is usingOraclize{
     if (recieved >= threshold) {
       currentETHPrice /= conversion_apis.length;
       require(inTheMoney(currentETHPrice));
-      require(underlyingAmount <= address(this).balance); // should be equal!
+      /* require(underlyingAmount <= address(this).balance); // should be equal! */
 
       // TODO(eforde): be careful about reentry here
 
@@ -117,25 +120,31 @@ contract Option is usingOraclize{
       optionBuyer.transfer(holderSettlementAmout);
       //TODO(moezinia) send rest to seller (is amount of ether equivalent to strike price..) in WEI
       uint writerSettlementAmount = (strikePriceUSD/currentETHPrice) * underlyingAmount;
-      require(writerSettlementAmount == address(this).balance);
-      selfdestruct(optionSeller); // less gass
+      /* require(writerSettlementAmount == address(this).balance); */
+      /* selfdestruct(optionSeller); */
+      optionSeller.transfer(writerSettlementAmount);
 
       // TODO(eforde: kill contract
     }
   }
 
-  // initialize exercise
-  function exercise() public {
-    //TODO(magendanz) can seller exercise?
+  function exerciseCost() public returns (uint exerciseGasCost) {
+    exerciseGasCost = (conversion_apis.length * oraclize_getPrice("URL"));
+    return exerciseGasCost;
+  }
+
+
+  function exercise() public payable {
     require(msg.sender == optionBuyer);
     require(block.timestamp < maturityTime); // TODO(eforde): otherwise expire
-    require(optionType == false);
-
-    // Need ETH in this.balance to request current ETH price. Return error string if insufficient funds
-    require((conversion_apis.length * oraclize_getPrice("URL")) > address(this).balance); //TODO(magendanz) make sure this balance var is not used for anything else
+    require(optionType == false); // has to be call for now
+    require((conversion_apis.length * oraclize_getPrice("URL")) <= msg.value);
     for (uint i = 0; i < conversion_apis.length; i++) {
       requests[i] = oraclize_query("URL", conversion_apis[i]);
     }
+
+
+
   }
 
 
