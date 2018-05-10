@@ -166,7 +166,7 @@ contract Option is usingOraclize{
     require(block.timestamp < maturityTime); // TODO(eforde): otherwise expire
     require(optionType == false); // has to be call for now
     /* require((conversion_apis.length * oraclize_getPrice("URL")) <= msg.value); */
-    require(msg.value >oraclize_getPrice("URL"));
+    require(msg.value > oraclize_getPrice("URL"));
     bytes32 queryId = oraclize_query("URL", ETH_PRICE_URL);
     validIds[queryId] = true;
     /* for (uint i = 0; i < conversion_apis.length; i++) {
@@ -190,10 +190,12 @@ contract Option is usingOraclize{
 
     /* uint holderSettlementAmout = ((currentETHPrice - strikePriceUSD)/currentETHPrice) * underlyingAmount; */
     uint holderSettlementAmout = address(this).balance; // whatever is left over!
-    optionBuyer.transfer(holderSettlementAmout);
+    selfdestruct(optionBuyer); //TODO(moezinia) !!! does this work??
+    /* optionBuyer.transfer(holderSettlementAmout); */
     emit LogTransferMade(address(this), optionBuyer, holderSettlementAmout);
 
     isActive = false;
+
   }
 
 

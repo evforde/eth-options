@@ -42,6 +42,13 @@ fs.readFile("./public/contracts/__contracts_Option_sol_Option.bin", "ascii", fun
   optionContractBinary = data;
 });
 
+// order book
+fs.readFile("./public/contracts/__contracts_Option_sol_Option.bin", "ascii", function(err, data) {
+  if (err)
+    throw err;  // make sure you've compiled the smart contracts!
+  orderBookBinary = data;
+});
+
 //
 // views
 //

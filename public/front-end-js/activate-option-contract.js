@@ -15,7 +15,7 @@ $(document).ready(function() {
     "optionCreatorType":false,
     "optionType":false,
     "active":false,
-    "smartContractAddress":"0xACf81CD62c1ac1663c8E136f490C22D7dFA0Da0a"};
+    "smartContractAddress":"0x631af922c77b34ccebf572b2f3e05fe7527a2830"};
     optionObj = testOptionObj;
 
 

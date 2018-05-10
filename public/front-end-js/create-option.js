@@ -114,9 +114,9 @@ $(document).ready(function() {
 
     //TODO remove, just for testing
     premiumPrice = 1;
-    offerExpiry = 99999999999999999;
+    offerExpiry = 999999999999999;
     ETHStrikePrice = 100;
-    maturityDate = 9999999999999;
+    maturityDate = 99999999999990;
     //TODO
 
 
