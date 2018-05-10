@@ -4,7 +4,7 @@ contract OrderBook {
 
   // date -> strikeprice -> smartContractAddress;
   mapping(uint => mapping(uint => address[])) public orderbookmap;
-  address[](1) noOptions = [];
+  address[] noOptions = new address[](0);
   // or use struct?
 
   // events
