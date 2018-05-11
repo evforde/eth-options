@@ -23,6 +23,9 @@
     const TradingAccountBinary = decodeURIComponent('<%= tradingAccountBinary %>');
     const OptionContractABI = JSON.parse('<%= optionContractABI %>'.replace(/&#34;/g, "\"").slice(1, -1));
     const OptionContractBinary = decodeURIComponent('<%= optionContractBinary %>');
+    //TODO(moezinia) add
+    // const OrderBookABI = JSON.parse('<%= optionContractABI %>'.replace(/&#34;/g, "\"").slice(1, -1));
+    // const OrderBookBinary = decodeURIComponent('<%= optionContractBinary %>');
   </script>
 </head>
 
@@ -43,8 +46,24 @@
       <div class="content">
         <p>
           Home:
-          Create Option Contract Here:
+          Create Option Contract Here: or in trade tab?
         </p>
+
+
+        <div class="container">
+          <div id="user-option-content" class="user-content">
+            Your Options
+            <div id="user-active-options"> Your Active Options
+            </div>
+            <div id="user-inactive-options"> Your Inactive Options
+            </div>
+
+          </div>
+        </div>
+
+
+
+
         <div class="createOptionRow">
           <div id="maturiy">2019:01:01</div>
           <div id="ETHStrikePrice">$1000</div>

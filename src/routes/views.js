@@ -17,6 +17,8 @@ var tradingAccountABI;
 var tradingAccountBinary;
 var optionContractABI;
 var optionContractBinary;
+var orderBookBinary;
+var orderBookABI;
 
 fs.readFile("./public/contracts/__contracts_TradingAccount_sol_TradingAccount.abi", "ascii", function(err, data) {
   if (err)
@@ -43,17 +45,17 @@ fs.readFile("./public/contracts/__contracts_Option_sol_Option.bin", "ascii", fun
 });
 
 // order book bin
-// fs.readFile("./public/contracts/__contracts_Option_sol_Option.bin", "ascii", function(err, data) {
+// fs.readFile("./public/contracts/__contracts_OrderBook_sol_OrderBook.bin", "ascii", function(err, data) {
 //   if (err)
 //     throw err;  // make sure you've compiled the smart contracts!
 //   orderBookBinary = data;
 // });
-
-// order book abi
-// fs.readFile("./public/contracts/__contracts_Option_sol_Option.bin", "ascii", function(err, data) {
+//
+// // order book abi
+// fs.readFile("./public/contracts/__contracts_OrderBook_sol_OrderBook.abi", "ascii", function(err, data) {
 //   if (err)
 //     throw err;  // make sure you've compiled the smart contracts!
-//   orderBookBinary = data;
+//   orderBookABI = JSON.stringify(data);
 // });
 
 

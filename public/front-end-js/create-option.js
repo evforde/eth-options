@@ -63,9 +63,10 @@ class createOptionSmartContract {
           // console.log("successfully deployed contract at ", smartContractAddress);
           // console.log("contract info ", data);
           console.log(JSON.stringify(curOption), ' see if saved');
-          //TODO(moezinia) call set cookie
-          //TODO(moezinia) call load unactivated options into dashboard
-          // 6) update list of 'my options' tab?
+          setBrowserCookie(curOption);
+          //TODO add to orderbook (order-book.js)
+          //TODO call renderUserOptions
+          //TODO(moezinia) call renderNewlyCreatedOption
         }
       });
   }

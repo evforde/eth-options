@@ -13,6 +13,7 @@ contract OrderBook {
   // just open start
   constructor(uint _constrMaturity,
     uint _constrStrike, address _constrAd) public {
+      TODO, maybe prepopulate all possible mappings since happens anyway with empty []?
       orderbookmap[1][1] = [0x0];
   }
 
@@ -40,20 +41,23 @@ contract OrderBook {
   function addOption(uint maturityDate,
     uint strikePrice, address optionSmartContract) public {
     // new option
-    if (orderbookmap[maturityDate][strikePrice]) {
+    if (orderbookmap[maturityDate][strikePrice].length > 0) {
       orderbookmap[maturityDate][strikePrice].push(optionSmartContract);
     }
     //new strike price
     else {
-      if (orderbookmap[maturityDate]) {
+      //TODO(moezinia) basically no way to check if this date mapping has strike entries already...!
+      if (orderbookmap[maturityDate] > 0) {
+        //TODO(moezinia) does this have to be in memory or something?
         address[] newAddresses = [optionSmartContract];
-        orderbookmap[maturityDate][strikePrice] = newStrike_Option;
+        orderbookmap[maturityDate][strikePrice] = newAddresses;
       }
-      // new maturityDate
+      // new maturityDate and strike needed.
       else {
         address[] newAddressesforNewDate = [optionSmartContract];
-        mapping(uint => address[]) newDate_Strike_Option[strikePrice] = newAddressesforNewDate;
-        orderbookmap[maturityDate] = newDate_Strike_Option;
+        //TODO(moezinia) do these both? have to be in memory or something?
+        /* mapping(uint => address[]) newDate_Strike_Option[strikePrice] = newAddressesforNewDate; */
+        orderbookmap[maturityDate][strikePrice] = newAddressesforNewDate;
       }
     }
   }
@@ -62,13 +66,22 @@ contract OrderBook {
 
   function queryOrderBook(uint maturityDate,
     uint strikePrice) public pure returns (address[]) {
-    if (orderbookmap[maturityDate][strikePrice]) {
+    if (orderbookmap[maturityDate][strikePrice].length > 0) {
       return orderbookmap[maturityDate][strikePrice];
     }
     else { //empty[]
       return noOptions;
     }
   }
+
+  function deleteActivatedOption(uint maturityDate,
+    uint strikePrice, address optionSmartContract) {
+      options = orderbookmap[maturityDate][strikePrice];
+      for (uint i = 0; i < options.length; i++) {
+        if (options[i] == optionSmartContract) {
+          delete options[i];
+        }
+    }
 
 
   // ===== Utility functions ===== //
