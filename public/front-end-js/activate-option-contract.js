@@ -66,6 +66,7 @@ $(document).ready(function() {
                 optionObj.active = true;
                 console.log(optionObj.contractAddress, 'bye');
                 setBrowserCookie(optionObj);
+                  //TODO remove from orderbook
                 //TODO(moezinia) need to remove from order book contract...
                 //TODO call renderUserOptions
 

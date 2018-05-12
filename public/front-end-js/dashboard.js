@@ -10,6 +10,7 @@ $(document).ready(function() {
   const TradingAccount = web3.eth.contract(TradingAccountABI);
   //TODO(moezinia) turn on!
   // renderUserOptions();
+  // const OrderBook = web3.eth.contract(OrderBookABI);
 
   $("#make-account").click(function() {
     // TODO(eforde): contract instantiation should probably be done on server
@@ -40,5 +41,7 @@ $(document).ready(function() {
         }
       });
     });
+
+
   });
 });

@@ -6,6 +6,12 @@
 
 // then display in UI
 
+
+// onpage load, get date, strike from url (trade.ejs)
+
+// call renderInactiveOptions and then
+
+
 function renderInactiveOptions(maturityDate, strikePriceUSD) {
   allOpt = getInactiveOptionInfo(maturityDate, strikePriceUSD);
   //TODO call populateInactiveOptions..

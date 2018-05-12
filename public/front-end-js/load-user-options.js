@@ -6,7 +6,6 @@ function renderUserOptions() {
   // once option is activated, smart contract is updated so will change upon refresh.
   userOptionInfo = getUserOptionInfo();
   populateUserOptions(userOptionInfo);
-  }
 
 }
 
@@ -20,7 +19,7 @@ function populateUserOptions(options) {
     let scrollTop = 0;
     for (let i = 0; i < options.length; i++) {
       //TODO(moezinia) get RIGHT DIV
-      $('#options').append(optionItemTemplate(options[i]));
+      $('#user-option').append(optionItemTemplate(options[i]));
     }
     // rebindEventHandlers();
     // recalcAnimations();

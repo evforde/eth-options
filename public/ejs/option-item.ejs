@@ -1,3 +1,4 @@
+<!-- These are items displaying generated strikes and average of bid/ask prices...  -->
 <% if (typeof currentPrice != "number" || !currentPrice) { currentPrice = false; } %>
 <% if (!currentPrice) { %>
 <div class="option-item" data-strike="<%=strike%>">
@@ -6,7 +7,7 @@
     <p class="option-type">call</p>
   </div>
   <div class="premium-info">
-    <p>$<%= premium.toFixed(2) %></p>
+    <p><%= premium.toFixed(2) %>ETH</p>
   </div>
 </div>
 <% } else { %>

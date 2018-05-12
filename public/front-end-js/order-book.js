@@ -13,7 +13,7 @@ function addToOrderBook(optionSmartContract) {
 }
 
 
-function getAllInactiveOptionInfo(maturityDate, strikePriceUSD) {
+function getInactiveOptionInfo(maturityDate, strikePriceUSD) {
   //TODO(moezinia) from order book smart contract with this maturity and strike...
   scAddress = "0xORDERBOOK!";
   inactiveOptionInfo = queryOrderBook(scAddress);
