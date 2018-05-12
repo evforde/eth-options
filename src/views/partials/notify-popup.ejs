@@ -1,0 +1,57 @@
+<style>
+#notify-popup-window {
+  position: fixed;
+  right: 12px;
+  top: 79px;
+  max-width: 370px;
+  z-index: 11;
+}
+#notify-popup-window .notify-popup {
+  width: 346px;
+  height: 80px;
+  background: #eee;
+  padding: 12px;
+  border-radius: 3px;
+  position: relative;
+  left: 36px;
+  opacity: 0;
+  transition: .2s;
+  margin-top: 12px;
+  z-index: 12;
+  font-size: 16px;
+}
+#notify-popup-window .notify-popup .notify-popup-header {
+  font-weight: 800;
+}
+#notify-popup-window .notify-popup.shown {
+  opacity: 1;
+  left: 0;
+}
+.shadow {
+  -webkit-box-shadow: 12px 12px 64px -12px rgba(0, 0, 0, 0.75);
+  -moz-box-shadow: 12px 12px 64px -12px rgba(0, 0, 0, 0.75);
+  box-shadow: 12px 12px 64px -12px rgba(0, 0, 0, 0.75);
+}
+</style>
+
+<div id="notify-popup-window">
+</div>
+
+<script>
+function showNotifyPopup(header, message) {
+    $.get('/static/ejs/notify-popup-item.ejs', function (template) {
+        var messageTemplate = ejs.compile(template);
+        var msg = $(messageTemplate({ header: header, message: message }));
+        $("#notify-popup-window").prepend(msg);
+        msg.animate({ "opacity": "1", "left": "0" }, 100);
+        msg.click(function(e) {
+            $(this).animate({ "opacity": "0", "left": "36px" }, 100); 
+            setTimeout(function(t) { return function() { t.remove(); } }($(this)), 200);
+        });
+        setTimeout(function(t) { return function() { 
+            t.animate({ "opacity": "0", "left": "36px" }, 100); 
+            setTimeout(function(t) { return function() { t.remove(); } }(t), 200);
+        }; }(msg), 8000);
+    });
+}
+</script>

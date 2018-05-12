@@ -1,7 +1,6 @@
 pragma solidity ^0.4.0;
-import "./usingOraclize.sol";
 
-contract Option is usingOraclize{
+contract Option {
   uint constant public underlyingAmount = 1000000000000000000; // 1 eth in wei
 
   address public optionBuyer;
@@ -38,13 +37,13 @@ contract Option is usingOraclize{
     require(_optionType == false); // Only allow calls
     // set optionBuyer/optionSeller based on optionCreatorType
     if (_traderType) {
-      require(msg.value == premiumAmount);
-      require(address(this).balance == premiumAmount);
+      // require(msg.value == premiumAmount); // TODO
+      // require(address(this).balance == premiumAmount);
       optionBuyer = msg.sender;
     }
     else {
-      require(msg.value == underlyingAmount);
-      require(address(this).balance == underlyingAmount);
+      // require(msg.value == underlyingAmount);
+      // require(address(this).balance == underlyingAmount);
       optionSeller = msg.sender;
     }
 

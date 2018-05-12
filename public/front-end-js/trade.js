@@ -1,6 +1,8 @@
-// TODO(eforde): rename price -> premium in exchange
+var OptionContract;
 
 $(document).ready(function() {
+  OptionContract = web3.eth.contract(OptionContractABI);
+
   // TODO(eforde): fill with real bids and asks for this contract
   let bids = [];
   for (let i = 0; i < 8; i++) {
@@ -21,6 +23,43 @@ $(document).ready(function() {
     });
   }
   populateBidAsk(bids, asks);
+
+  $("#new-bid-button").click(function() {
+    showPopup(
+      "New bid",
+      "Create a bid for " + date + " $" + strike + " call? You will " +
+      "immediately pay the premium, but you may cancel your order any " +
+      "time before another user takes the sell side.",
+      "premium",
+      function(input) {
+        return parseFloat(input);
+      },
+      function(resp) {
+        if (!resp.success)
+          return;
+          deployOptionContract(parseFloat(resp.input), true);
+      }
+    );
+  });
+
+  $("#new-ask-button").click(function() {
+    showPopup(
+      "New ask",
+      "Create a ask for " + date + " $" + strike + " call? You will " +
+      "immediately pay the underlying amount in ethereum, but you may cancel " +
+      "your order any time before another user takes the buy side.",
+      "premium",
+      function(input) {
+        return parseFloat(input);
+      },
+      function(resp) {
+        if (!resp.success)
+          return;
+        console.log("make a ask!");
+        // TODO(eforde): take the buy side!
+      }
+    )
+  });
 });
 
 function populateBidAsk(bids, asks) {
@@ -56,6 +95,7 @@ function bindEventHandlers() {
       " the right to exercise your option at any time if it is in the money " +
       "before expiry.",
       null,
+      null,
       function(resp) {
         if (!resp.success)
           return;
@@ -82,4 +122,45 @@ function bindEventHandlers() {
       }
     )
   });
+}
+
+function deployOptionContract(premium, traderType) { // true = buyer, false = seller
+  getMetamaskAccount(function(account) {
+    console.log("deploying option contract for ", account);
+    let maturityTimeSeconds = new Date(date).getTime() / 1000;
+    let cancellationTime = maturityTimeSeconds; // TODO(eforde)!!!!!
+    let premiumWei = premium * 1e18;
+    console.log([false, strike, maturityTimeSeconds, cancellationTime, premiumWei, traderType]);
+    var contractInstance = OptionContract.new({
+      data: OptionContractBinary,
+      from: account,
+      gas: 4000000,
+      arguments: [false, strike, maturityTimeSeconds, cancellationTime, premiumWei, traderType]
+    }, function(err, data) {
+      if (err) {
+        showNotifyPopup("Error", err);
+        console.log(err);
+        return;
+      }
+      if (data && data.address === undefined) {
+        showNotifyPopup(
+          "Waiting to mine...",
+          "Follow progress <a href=\"https://ropsten.etherscan.io/tx/" +
+          data.transactionHash + "\" target=\"_blank\">here</a>"
+        );
+        console.log("waiting for someone to mine block...");
+        console.log("txn ", data.transactionHash, );
+        return;
+      }
+      if (data.address) {
+        showNotifyPopup("Deployed!", "at address " + data.address);
+        console.log("successfully deployed contract at ", data.address);
+        console.log(data);
+        // data.owner(function(err, data) {
+        //   console.log("owner of contract is ", err || data);
+        // });
+      }
+    });
+  });
+
 }

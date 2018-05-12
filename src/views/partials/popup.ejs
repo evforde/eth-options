@@ -16,7 +16,6 @@
 }
 #popup {
   width: 500px;
-  height: 400px;
   position: fixed;
   left: calc(50vw - 250px);
   padding-top: 12px;
@@ -26,7 +25,8 @@
   list-style-type: none;
   opacity: 0;
   top: calc(40% - 100px);
-  transition: .2s;
+  transition: all .2s, height 0s;
+  text-align: left;
 }
 #popup-dimmer.shown #popup {
   top: calc(45% - 100px);
@@ -36,12 +36,14 @@
   font-weight: 300;
   font-size: 34px;
   margin: 0;
+  text-align: center;
+}
+#popup #message-container {
+  margin: 0 12px 16px;
 }
 #popup #message {
-  /* TODO(eforde): allow this to be multiline */
   color: #555;
-  margin-bottom: 16px;
-  text-align: left;
+  user-select: text;
 }
 #popup input {
   border: 0;
@@ -77,6 +79,7 @@
   color: white;
   cursor: pointer;
   transform-origin: 0 100%;
+  text-align: center;
 }
 #cancel-button {
   background-color: #ccc;
@@ -97,10 +100,10 @@
 <div id="popup-dimmer">
     <div id="popup">
         <h1 id="header">header</h1>
-        <span id="message">message</span>
-        <% if (inputname) { %>
+        <div id="message-container">
+          <span id="message">message</span>
+        </div>
         <input name="input" id="input" type="text" placeholder="inputname" />
-        <% } %>
         <div id="buttons">
             <p id="cancel-button">cancel</p>
             <p id="confirm-button">confirm</p>
@@ -109,17 +112,28 @@
 </div>
 
 <script>
-var callback;
+var callback, validate_input;
 
-function showPopup(header, msg, inputname, _callback) {
+function showPopup(header, msg, inputname, _validate_input, _callback) {
   $("#header").text(header);
   $("#message").text(msg);
-  $("#input").attr("placeholder", inputname);
-  $("#input").removeClass("invalid");
-  $("#input").attr("value", "");
+  if (inputname) {
+    $("#input").css("visibility", "visible");
+    $("#input").css("display", "block");
+    $("#popup").css("height", "250px");
+    $("#input").attr("placeholder", inputname);
+    $("#input").val("");
+    $("#input").removeClass("invalid");
+  }
+  else {
+    $("#input").css("visibility", "collapse");
+    $("#input").css("display", "none");
+    $("#popup").css("height", "200px");
+  }
+  validate_input = _validate_input;
+  callback = _callback;
   $('#popup-dimmer').addClass('shown');
   $("#input").focus();
-  callback = _callback;
 }
 
 $("#new-station-name").keyup(function(e){
@@ -129,8 +143,9 @@ $("#new-station-name").keyup(function(e){
 
 $("#confirm-button").click(function() {
   if ($("#input").length) {
-    let input = $("#input").attr("value").trim();
-    if (input == "") {
+    let input = $("#input").val().trim();
+    valid_input = validate_input && validate_input(input);
+    if (input == "" || !valid_input) {
       $("#input").addClass("invalid");
       return;
     }

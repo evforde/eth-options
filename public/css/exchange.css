@@ -3,11 +3,12 @@
   max-height: 64px;
   overflow-x: scroll;
   overflow-y: none;
+  white-space: nowrap;
   position: fixed;
   z-index: 5;
 }
 .date {
-  float: left;
+  display: inline-block;
   padding: 20px 60px;
   background-color: #555;
   opacity: 0.97;
@@ -47,9 +48,10 @@
   transition: .2s;
   cursor: pointer !important;
 }
-.option-item:hover {
+.option-item:not(#current-price-marker):hover {
   background: #eee;
   opacity: 1 !important;
+  transform: scale(1.01) !important;
 }
 .option-item:hover .price-info {
   border-right-color: #f00; /* TODO */

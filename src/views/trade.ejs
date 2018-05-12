@@ -12,12 +12,15 @@
   <script src="/static/front-end-js/cookies.js"></script>
   <script src="/static/front-end-js/load-unactivated-options.js"></script>
   <script>
-    var date = "<%= date %>";
-    var strike = <%= strike %>;
+    const date = "<%= date %>";
+    const strike = <%= strike %>;
+    const OptionContractABI = JSON.parse('<%= optionContractABI %>'.replace(/&#34;/g, "\"").slice(1, -1));
+    const OptionContractBinary = decodeURIComponent('<%= optionContractBinary %>');
   </script>
 </head>
 <body>
   <% include ./partials/popup %>
+  <% include ./partials/notify-popup %>
   <% include ./partials/header %>
 
   <div id="page">

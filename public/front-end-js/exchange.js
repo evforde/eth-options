@@ -76,7 +76,7 @@ function recalcAnimations() {
       s += 1;
       let tween = TweenMax.fromTo(
         '.option-item:nth-last-child(' + s + ')', 0.5,
-        { autoAlpha: 0.8, scale: 0.95 }, { autoAlpha: 1, scale: 1 }
+        { autoAlpha: 0.8, scale: 0.99 }, { autoAlpha: 1, scale: 1 }
       );
       let scene = (new ScrollMagic.Scene({ offset: (1 - s) * 85 + scrollHeight, duration }))
         .setTween(tween);

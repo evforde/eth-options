@@ -16,6 +16,7 @@ contract TradingAccount {
 
   struct Reservation {
     bool isAuthorized;
+    uint[] test;
     uint amount;
   }
 
