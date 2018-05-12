@@ -1,6 +1,8 @@
-// TODO(eforde): rename price -> premium in exchange
+var OptionContract;
 
 $(document).ready(function() {
+  OptionContract = web3.eth.contract(OptionContractABI);
+
   // TODO(eforde): fill with real bids and asks for this contract
   let bids = [];
   for (let i = 0; i < 8; i++) {
@@ -21,6 +23,42 @@ $(document).ready(function() {
     });
   }
   populateBidAsk(bids, asks);
+
+  $("#new-bid-button").click(function() {
+    showPopup(
+      "Buy " + date + " $" + strike + " call",
+      "You will immediately pay the premium, but you may cancel your order " +
+      "any time before another user takes the sell side. If your " +
+      "order remains unfufilled, it will be canceled in 24 hours.",
+      "premium (eth)",
+      function(input) {
+        return parseFloat(input);
+      },
+      function(resp) {
+        if (!resp.success)
+          return;
+          deployOptionContract(parseFloat(resp.input), true);
+      }
+    );
+  });
+
+  $("#new-ask-button").click(function() {
+    showPopup(
+      "Sell " + date + " $" + strike + " call",
+      "You will immediately pay the underlying 1 ETH, but you may cancel " +
+      "your order any time before another user takes the buy side. If your " +
+      "order remains unfufilled, it will be canceled in 24 hours.",
+      "premium (eth)",
+      function(input) {
+        return parseFloat(input);
+      },
+      function(resp) {
+        if (!resp.success)
+          return;
+        deployOptionContract(parseFloat(resp.input), false);
+      }
+    )
+  });
 });
 
 function populateBidAsk(bids, asks) {
@@ -56,6 +94,7 @@ function bindEventHandlers() {
       " the right to exercise your option at any time if it is in the money " +
       "before expiry.",
       null,
+      null,
       function(resp) {
         if (!resp.success)
           return;
@@ -74,6 +113,7 @@ function bindEventHandlers() {
       " deployed at " + contractAddress + ".",
       // TODO(eforde)
       null,
+      null,
       function(resp) {
         if (!resp.success)
           return;
@@ -82,4 +122,50 @@ function bindEventHandlers() {
       }
     )
   });
+}
+
+function deployOptionContract(premium, traderType) { // true = buyer, false = seller
+  // buyer must send premium, seller must send 1 eth
+  let msgValue = traderType ? premium * 1e18 : 1e18;
+  let maturityTimeSeconds = new Date(date).getTime() / 1000;
+  // cancel orders after a day
+  let cancellationTime = new Date().getTime() / 1000;
+  let premiumWei = premium * 1e18;
+  getMetamaskAccount(function(account) {
+    var contractInstance = OptionContract.new(
+      false,
+      strike,
+      maturityTimeSeconds,
+      cancellationTime,
+      premiumWei,
+      traderType,
+      {
+        data: OptionContractBinary,
+        from: account,
+        gas: 4e6,
+        value: msgValue
+      }, function(err, data) {
+        if (err) {
+          showNotifyPopup("Error", err);
+          console.log("Error while creating contract: ", err);
+          return;
+        }
+        if (data && data.address === undefined) {
+          showNotifyPopup(
+            "Waiting to mine...",
+            "Follow progress <a href=\"https://ropsten.etherscan.io/tx/" +
+            data.transactionHash + "\" target=\"_blank\">here</a>",
+            true
+          );
+          console.log("waiting for someone to mine block... txn:",
+                      data.transactionHash);
+          return;
+        }
+        if (data.address) {
+          showNotifyPopup("Order created!", "Your contract is live at address " + data.address);
+          console.log("successfully deployed contract at ", data.address);
+        }
+    });
+  });
+
 }

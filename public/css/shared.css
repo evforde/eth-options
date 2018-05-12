@@ -41,6 +41,9 @@ p, span, h1, h2 {
   cursor: pointer;
   transition: .2s all ease-in-out;
 }
+a {
+  color: #4e4e9d;
+}
 .btn:hover {
   border-bottom-width: 4px;
   padding-bottom: 0px;

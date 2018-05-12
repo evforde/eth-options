@@ -76,9 +76,7 @@ router.get("/dashboard", function(req, res, next) {
   res.render("dashboard", {
     user: req.user,
     tradingAccountABI: tradingAccountABI,
-    tradingAccountBinary: tradingAccountBinary,
-    optionContractABI: optionContractABI,
-    optionContractBinary: optionContractBinary
+    tradingAccountBinary: tradingAccountBinary
   });
 });
 
@@ -95,7 +93,9 @@ router.get("/trade", function(req, res, next) {
   res.render("trade", {
     user: req.user,
     strike: req.query.strike,
-    date: req.query.date
+    date: req.query.date,
+    optionContractABI: optionContractABI,
+    optionContractBinary: optionContractBinary
   });
 });
 
