@@ -39,7 +39,7 @@
   text-align: center;
 }
 #popup #message-container {
-  margin: 0 12px 16px;
+  margin: 18px 12px;
 }
 #popup #message {
   color: #555;
@@ -47,10 +47,10 @@
 }
 #popup input {
   border: 0;
-  width: calc(100% - 48px);
+  width: calc(100% - 24px);
   font-size: 18px;
-  padding: 12px;
-  margin: 12px 12px 4px 12px;
+  padding: 12px 0px;
+  margin: 0 12px 4px 12px;
   border-bottom: solid 1px;
   border-bottom-color: #e5e5e5;
   background: rgba(255, 255, 255, 0.95);
@@ -103,7 +103,7 @@
         <div id="message-container">
           <span id="message">message</span>
         </div>
-        <input name="input" id="input" type="text" placeholder="inputname" />
+        <input name="input" id="popup-input" type="text" placeholder="inputname" />
         <div id="buttons">
             <p id="cancel-button">cancel</p>
             <p id="confirm-button">confirm</p>
@@ -112,55 +112,56 @@
 </div>
 
 <script>
-var callback, validate_input;
+var popup_callback;
+var validate_input;
 
-function showPopup(header, msg, inputname, _validate_input, _callback) {
+function showPopup(header, msg, inputname, _validate_input, _popup_callback) {
+  validate_input = _validate_input;
+  popup_callback = _popup_callback;
   $("#header").text(header);
   $("#message").text(msg);
   if (inputname) {
-    $("#input").css("visibility", "visible");
-    $("#input").css("display", "block");
+    $("#popup-input").css("visibility", "visible");
+    $("#popup-input").css("display", "block");
     $("#popup").css("height", "250px");
-    $("#input").attr("placeholder", inputname);
-    $("#input").val("");
-    $("#input").removeClass("invalid");
+    $("#popup-input").attr("placeholder", inputname);
+    $("#popup-input").val("");
+    $("#popup-input").removeClass("invalid");
   }
   else {
-    $("#input").css("visibility", "collapse");
-    $("#input").css("display", "none");
+    $("#popup-input").css("visibility", "collapse");
+    $("#popup-input").css("display", "none");
     $("#popup").css("height", "200px");
   }
-  validate_input = _validate_input;
-  callback = _callback;
   $('#popup-dimmer').addClass('shown');
-  $("#input").focus();
+  $("#popup-input").focus();
 }
 
-$("#new-station-name").keyup(function(e){
-  if(e.which == 13)
-      $("#create-button").click();
+$("#popup-input").keyup(function(e){
+  if (e.which == 13)
+      $("#confirm-button").click();
 });
 
 $("#confirm-button").click(function() {
-  if ($("#input").length) {
-    let input = $("#input").val().trim();
+  if ($("#popup-input").length) {
+    let input = $("#popup-input").val().trim();
     valid_input = validate_input && validate_input(input);
     if (input == "" || !valid_input) {
-      $("#input").addClass("invalid");
+      $("#popup-input").addClass("invalid");
       return;
     }
     $("#popup-dimmer").removeClass("shown");
-    callback({success: true, input});
+    popup_callback({success: true, input});
     return;
   }
   $("#popup-dimmer").removeClass("shown");
-  callback({success: true});
+  popup_callback({success: true});
 });
 
 $("#popup-dimmer, #cancel-button").click(function(e) {
 	if (e.target !== this)
 		return;
 	$("#popup-dimmer").removeClass("shown");
-  callback({success: false});
+  popup_callback({success: false});
 });
 </script>

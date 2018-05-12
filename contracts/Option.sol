@@ -1,7 +1,7 @@
 pragma solidity ^0.4.0;
 
 contract Option {
-  uint constant public underlyingAmount = 1000000000000000000; // 1 eth in wei
+  uint constant public underlyingAmount = 1e18; // 1 eth in wei
 
   address public optionBuyer;
   address public optionSeller;
@@ -13,8 +13,6 @@ contract Option {
   uint public premiumAmount; // eth - wei in constructor
   uint public cancellationTime;
   uint public maturityTime;
-
-
 
   uint public currentETHPrice;
 
@@ -37,21 +35,18 @@ contract Option {
     require(_optionType == false); // Only allow calls
     // set optionBuyer/optionSeller based on optionCreatorType
     if (_traderType) {
-      // require(msg.value == premiumAmount); // TODO
-      // require(address(this).balance == premiumAmount);
+      require(msg.value >= _premiumAmount);
       optionBuyer = msg.sender;
     }
     else {
-      // require(msg.value == underlyingAmount);
-      // require(address(this).balance == underlyingAmount);
+      require(msg.value >= underlyingAmount);
       optionSeller = msg.sender;
     }
-
     optionCreatorType = _traderType;
     optionType = _optionType;
     strikePriceUSD = _strikePriceUSD;
     maturityTime = _maturityTime;
-    premiumAmount = (_premiumAmount*1000000000000000000);
+    premiumAmount = _premiumAmount;
     cancellationTime = _cancellationTime;
 
     isActive = false;

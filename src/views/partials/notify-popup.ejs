@@ -19,9 +19,13 @@
   margin-top: 12px;
   z-index: 12;
   font-size: 16px;
+  overflow: hidden;
 }
 #notify-popup-window .notify-popup .notify-popup-header {
   font-weight: 800;
+}
+#notify-popup-window .notify-popup .notify-popup-message {
+  word-break: break-all;
 }
 #notify-popup-window .notify-popup.shown {
   opacity: 1;
@@ -38,12 +42,18 @@
 </div>
 
 <script>
-function showNotifyPopup(header, message) {
-    $.get('/static/ejs/notify-popup-item.ejs', function (template) {
-        var messageTemplate = ejs.compile(template);
-        var msg = $(messageTemplate({ header: header, message: message }));
-        $("#notify-popup-window").prepend(msg);
-        msg.animate({ "opacity": "1", "left": "0" }, 100);
+function showNotifyPopup(header, message, untilNext) {
+  let oldMessages = $("#notify-popup-window .notify-popup[data-until-next=\"true\"]");
+  oldMessages.animate({ "opacity": "0", "left": "36px" }, 100); 
+  setTimeout(function() { oldMessages.remove(); }, 200);
+  $.get('/static/ejs/notify-popup-item.ejs', function (template) {
+      var messageTemplate = ejs.compile(template);
+      var msg = $(messageTemplate({ header, message, untilNext }));
+      $("#notify-popup-window").prepend(msg);
+      msg.animate({ "opacity": "1", "left": "0" }, 100);
+      // If we don't want this popup to persist until the next message is shown,
+      // allow dismissal by clicking and automatically dismiss after 8 seconds
+      if (!untilNext) {
         msg.click(function(e) {
             $(this).animate({ "opacity": "0", "left": "36px" }, 100); 
             setTimeout(function(t) { return function() { t.remove(); } }($(this)), 200);
@@ -52,6 +62,7 @@ function showNotifyPopup(header, message) {
             t.animate({ "opacity": "0", "left": "36px" }, 100); 
             setTimeout(function(t) { return function() { t.remove(); } }(t), 200);
         }; }(msg), 8000);
-    });
+      }
+  });
 }
 </script>

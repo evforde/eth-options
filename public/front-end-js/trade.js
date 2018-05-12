@@ -26,11 +26,11 @@ $(document).ready(function() {
 
   $("#new-bid-button").click(function() {
     showPopup(
-      "New bid",
-      "Create a bid for " + date + " $" + strike + " call? You will " +
-      "immediately pay the premium, but you may cancel your order any " +
-      "time before another user takes the sell side.",
-      "premium",
+      "Buy " + date + " $" + strike + " call",
+      "You will immediately pay the premium, but you may cancel your order " +
+      "any time before another user takes the sell side. If your " +
+      "order remains unfufilled, it will be canceled in 24 hours.",
+      "premium (eth)",
       function(input) {
         return parseFloat(input);
       },
@@ -44,19 +44,19 @@ $(document).ready(function() {
 
   $("#new-ask-button").click(function() {
     showPopup(
-      "New ask",
-      "Create a ask for " + date + " $" + strike + " call? You will " +
-      "immediately pay the underlying amount in ethereum, but you may cancel " +
-      "your order any time before another user takes the buy side.",
-      "premium",
+      "Sell " + date + " $" + strike + " call",
+      "You will immediately pay the underlying 1 ETH, but you may cancel " +
+      "your order any time before another user takes the buy side. If your " +
+      "order remains unfufilled, it will be canceled in 24 hours.",
+      "premium (eth)",
       function(input) {
         return parseFloat(input);
       },
       function(resp) {
         if (!resp.success)
           return;
-        console.log("make a ask!");
-        // TODO(eforde): take the buy side!
+        console.log("make an ask!");
+        deployOptionContract(parseFloat(resp.input), false);
       }
     )
   });
@@ -114,6 +114,7 @@ function bindEventHandlers() {
       " deployed at " + contractAddress + ".",
       // TODO(eforde)
       null,
+      null,
       function(resp) {
         if (!resp.success)
           return;
@@ -125,41 +126,47 @@ function bindEventHandlers() {
 }
 
 function deployOptionContract(premium, traderType) { // true = buyer, false = seller
+  // buyer must send premium, seller must send 1 eth
+  let msgValue = traderType ? premium * 1e18 : 1e18;
+  let maturityTimeSeconds = new Date(date).getTime() / 1000;
+  // TODO(eforde)!!!!!
+  // cancel orders after a day
+  let cancellationTime = new Date().getTime() / 1000;
+  let premiumWei = premium * 1e18;
   getMetamaskAccount(function(account) {
-    console.log("deploying option contract for ", account);
-    let maturityTimeSeconds = new Date(date).getTime() / 1000;
-    let cancellationTime = maturityTimeSeconds; // TODO(eforde)!!!!!
-    let premiumWei = premium * 1e18;
-    console.log([false, strike, maturityTimeSeconds, cancellationTime, premiumWei, traderType]);
-    var contractInstance = OptionContract.new({
-      data: OptionContractBinary,
-      from: account,
-      gas: 4000000,
-      arguments: [false, strike, maturityTimeSeconds, cancellationTime, premiumWei, traderType]
-    }, function(err, data) {
-      if (err) {
-        showNotifyPopup("Error", err);
-        console.log(err);
-        return;
-      }
-      if (data && data.address === undefined) {
-        showNotifyPopup(
-          "Waiting to mine...",
-          "Follow progress <a href=\"https://ropsten.etherscan.io/tx/" +
-          data.transactionHash + "\" target=\"_blank\">here</a>"
-        );
-        console.log("waiting for someone to mine block...");
-        console.log("txn ", data.transactionHash, );
-        return;
-      }
-      if (data.address) {
-        showNotifyPopup("Deployed!", "at address " + data.address);
-        console.log("successfully deployed contract at ", data.address);
-        console.log(data);
-        // data.owner(function(err, data) {
-        //   console.log("owner of contract is ", err || data);
-        // });
-      }
+    var contractInstance = OptionContract.new(
+      false,
+      strike,
+      maturityTimeSeconds,
+      cancellationTime,
+      premiumWei,
+      traderType,
+      {
+        data: OptionContractBinary,
+        from: account,
+        gas: 4e6,
+        value: msgValue
+      }, function(err, data) {
+        if (err) {
+          showNotifyPopup("Error", err);
+          console.log("Error while creating contract: ", err);
+          return;
+        }
+        if (data && data.address === undefined) {
+          showNotifyPopup(
+            "Waiting to mine...",
+            "Follow progress <a href=\"https://ropsten.etherscan.io/tx/" +
+            data.transactionHash + "\" target=\"_blank\">here</a>",
+            true
+          );
+          console.log("waiting for someone to mine block... txn:",
+                      data.transactionHash);
+          return;
+        }
+        if (data.address) {
+          showNotifyPopup("Order created!", "Your contract is live at address " + data.address);
+          console.log("successfully deployed contract at ", data.address);
+        }
     });
   });
 
