@@ -1,25 +1,43 @@
-#expiration-dates {
-  height: 64px;
-  max-height: 64px;
-  overflow-x: scroll;
-  overflow-y: none;
-  white-space: nowrap;
+#expiration-container {
+  height: 60px;
+  max-height: 60px;
   position: fixed;
   z-index: 5;
 }
+#expiration-dates {
+  height: 60px;
+  max-height: 60px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  z-index: 5;
+  background: #a6a6bd;
+}
+#expiration-dates::-webkit-scrollbar {
+  display: none;
+}
 .date {
   display: inline-block;
-  padding: 20px 60px;
-  background-color: #555;
+  margin: 6px 3px;
+  padding: 10px;
+  /* background-color: #555; */
   opacity: 0.97;
-  font-size: 20px;
-  color: white;
+  font-size: 24px;
+  font-weight: 100;
+  /* color: white; */
+  color: #4e4e9d;
   cursor: pointer;
   transition: .2s;
-  border-right: 1px solid #777;
+  /* border-right: 1px solid #777; */
+  border-radius: 4px;
+}
+.date.selected {
+  background-color: #4e4e9d;
+  color: #eee;
 }
 .date:hover {
-  background-color: #999;
+  background-color: #3d3d74;
+  color: #a6a6bd;
 }
 #options-content {
   padding-top: 64px;

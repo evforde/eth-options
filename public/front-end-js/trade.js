@@ -55,7 +55,6 @@ $(document).ready(function() {
       function(resp) {
         if (!resp.success)
           return;
-        console.log("make an ask!");
         deployOptionContract(parseFloat(resp.input), false);
       }
     )
@@ -129,7 +128,6 @@ function deployOptionContract(premium, traderType) { // true = buyer, false = se
   // buyer must send premium, seller must send 1 eth
   let msgValue = traderType ? premium * 1e18 : 1e18;
   let maturityTimeSeconds = new Date(date).getTime() / 1000;
-  // TODO(eforde)!!!!!
   // cancel orders after a day
   let cancellationTime = new Date().getTime() / 1000;
   let premiumWei = premium * 1e18;
