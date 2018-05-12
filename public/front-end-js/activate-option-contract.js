@@ -36,7 +36,6 @@ $(document).ready(function() {
       }
 
       const fallbackValues = {
-        // data: bytecode,
         // data: OptionContractBinary,
         from: this.optionObj.optionFulfillerAddress,
         gas: maxGasProvided,
@@ -66,9 +65,8 @@ $(document).ready(function() {
                 optionObj.active = true;
                 console.log(optionObj.contractAddress, 'bye');
                 setBrowserCookie(optionObj);
-                  //TODO remove from orderbook
-                //TODO(moezinia) need to remove from order book contract...
-                //TODO call renderUserOptions
+                removeFromOrderBook(optionObj.contractAddress);
+                //TODO call renderUserOptions?
 
               }
               else {
@@ -91,14 +89,13 @@ $(document).ready(function() {
 function getTransactionReceiptMined(txHash, interval, blockLimit) {
   var count = 0;
   var blocks = blockLimit;
-
+  //TODO(moezinia) count block fucking stuff up!
   const transactionReceiptAsync = function(resolve, reject) {
       if (count > blocks) {
         reject(blocks + " blocks mined but no txn receipt!");
         // reject('Contract transaction couldn\'t be found after ', blocks, ' blocks');
         return;
       }
-
       web3.eth.getTransactionReceipt(txHash, (error, receipt) => {
           if (error) {
             console.log("promise error", error);
@@ -111,7 +108,6 @@ function getTransactionReceiptMined(txHash, interval, blockLimit) {
               resolve(receipt);
           }
       });
-
       count++;
   };
 

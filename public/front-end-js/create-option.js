@@ -60,13 +60,10 @@ class createOptionSmartContract {
         if (data.address) {
           smartContractAddress = data.address;
           curOption.smartContractAddress = smartContractAddress;
-          // console.log("successfully deployed contract at ", smartContractAddress);
           // console.log("contract info ", data);
           console.log(JSON.stringify(curOption), ' see if saved');
           setBrowserCookie(curOption);
-          //TODO add to orderbook (order-book.js)
-          //TODO call renderUserOptions
-          //TODO(moezinia) call renderNewlyCreatedOption
+          addToOrderBook(smartContractAddress, curOption.maturityDate, curOption.ETHStrikePrice);
         }
       });
   }
@@ -121,8 +118,6 @@ $(document).ready(function() {
     //TODO
 
 
-
-    // TODO unless use tradingaccount ?
     getMetamaskAccount(function(optionCreatorAddress) {
 
 
@@ -139,29 +134,3 @@ $(document).ready(function() {
   });
 
 });
-
-
-
-
-
-
-
-
-// function sendToIPFS(payload) {
-//   $.ajax({
-//     type: "POST",
-//     url: "/api/appendToIPFS",
-//     data: {
-//       data: payload,
-//       maturity: payload.maturity
-//     },
-//     error: function(err) {
-//       console.log(err, "error from post");
-//       return err;
-//     },
-//     success: function(res) {
-//       // console.log("result from post is", res);
-//       return res;
-//     }
-//   });
-// }

@@ -1,40 +1,105 @@
-function addToOrderBook(optionSmartContract) {
-
-    // OrderBookABI
-    // get contract address
-
-    // call the method to add to orderbook.
-
-
-
-
-
-
+const maxGasProvided = 1000000; //gas limit max 4665264   860444 used for create/deposit!
+const gasPrice = "20000000000"; // 20 Gwei (next few blocks ~ few seconds)
+const orderBookAddress = "0x.."
+const orderBookContract = web3.eth.contract(OrderBookABI, null, fallbackValues);
+const orderBookContractInstance = orderBookContract.at(orderBookAddress);
+const fallbackValues = {
+  // data: OptionContractBinary,
+  gas: maxGasProvided,
+  gasPrice: gasPrice
 }
 
-
-function getInactiveOptionInfo(maturityDate, strikePriceUSD) {
-  //TODO(moezinia) from order book smart contract with this maturity and strike...
-  scAddress = "0xORDERBOOK!";
-  inactiveOptionInfo = queryOrderBook(scAddress);
-  return inactiveOptionInfo;
-}
-
-
-//TODO(moezinia)
-function queryOrderBook(scAddress) {
-  const orderBookContract = web3.eth.contract(OrderBookContractABI, null).at(scAddress);
-  // const curOption = {};
-  const inactiveOptionInfo = [];
-  inActiveOptions = orderBookContract.allOptions.call(
+function addToOrderBook(optionSmartContract, maturityDate, strikePrice) {
+  fallbackValues.from = optionSmartContract;
+  // can put back args..maturityDate, strikePrice, optionSmartContract
+  orderBookContractInstance.addOption(fallbackValues,
     (err, res) => {
       if (err) {
-        console.log("error retrieving from ", scAddress);
+        console.log(err);
+        alert("Error with adding to order book", err);
       }
       else {
-        //TODO get res....
+        txnHash = res.toString();
+        console.log(txnHash);
+        // now txn pending..
+        prom = getTransactionReceiptMined(txnHash, 2000, 95);
+        prom.then(function(receipt) {
+          if (receipt.status == "0x1") {
+            alert("Option Added to Order Book!");
+          }
+          else {
+            console.log("no way to debug on testnet");
+            alert("Option Unable to be added.");
+          }
+        }, function(error) {
+          alert("Option Unable to be added");
+          console.log(error);
+        });
       }
-    }
-  );
-  return inactiveOptionInfo;
+    });
+}
+
+function removeFromOrderBook(optionSmartContract) {
+
+  fallbackValues.from = optionSmartContract;
+
+  // can put back args..maturityDate, strikePrice, optionSmartContract
+  orderBookContractInstance.deleteActivatedOption(fallbackValues,
+    (err, res) => {
+      if (err) {
+        console.log(err);
+        alert("Error with removing from order book", err);
+      }
+      else {
+        txnHash = res.toString();
+        console.log(txnHash);
+        // now txn pending..
+        prom = getTransactionReceiptMined(txnHash, 2000, 95);
+        prom.then(function(receipt) {
+          if (receipt.status == "0x1") {
+            alert("Option removed from Order Book!");
+          }
+          else {
+            console.log("no way to debug on testnet");
+            alert("Option Unable to be removed.");
+          }
+        }, function(error) {
+          alert("Option Unable to be removed");
+          console.log(error);
+        });
+      }
+    });
+
+}
+
+
+function getInactiveOptionInfo(maturityDate, strikePriceUSD, cb) {
+  orderBookContractInstance.queryOrderBook(maturityDate, strikePriceUSD, fallbackValues,
+    (err, res) => {
+      if (err) {
+        console.log(err);
+        alert("Error with querying order book", err);
+      }
+      else {
+        txnHash = res.toString();
+        console.log(txnHash);
+        // now txn pending..
+        prom = getTransactionReceiptMined(txnHash, 2000, 95);
+        prom.then(function(receipt) {
+          if (receipt.status == "0x1") {
+            alert("Option removed from Order Book!");
+
+            //TODO(eforde) get addresses then querySC for info...
+            cb(addresses)
+          }
+          else {
+            console.log("no way to debug on testnet");
+            alert("querying error.");
+          }
+        }, function(error) {
+          alert("querying error");
+          console.log(error);
+        });
+      }
+    });
 }

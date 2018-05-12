@@ -13,7 +13,6 @@ function querySC(scAddress) {
   // batch.add(myContractInstance.doSomething(arg1, arg2, {from: account, gas: 4000000}));
   // batch.execute()
 
-
   isActive = optionSmartContract.isActive.call(
     (err, res) => {
       if (err) {
@@ -290,6 +289,6 @@ function queryInactiveSC(scAddress) {
     }
   );
 
-//
+
   return curObj;
 }

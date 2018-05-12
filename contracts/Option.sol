@@ -54,7 +54,6 @@ contract Option is usingOraclize{
     maturityTime = _maturityTime;
     premiumAmount = (_premiumAmount*1000000000000000000);
     cancellationTime = _cancellationTime;
-
     isActive = false;
   }
 
