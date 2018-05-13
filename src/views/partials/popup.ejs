@@ -123,7 +123,7 @@ function showPopup(header, msg, inputname, _validate_input, _popup_callback) {
   if (inputname) {
     $("#popup-input").css("visibility", "visible");
     $("#popup-input").css("display", "block");
-    $("#popup").css("height", "250px");
+    $("#popup").css("height", "280px");
     $("#popup-input").attr("placeholder", inputname);
     $("#popup-input").val("");
     $("#popup-input").removeClass("invalid");
@@ -143,7 +143,7 @@ $("#popup-input").keyup(function(e){
 });
 
 $("#confirm-button").click(function() {
-  if ($("#popup-input").length) {
+  if ($("#popup-input").css("display") === "block") {
     let input = $("#popup-input").val().trim();
     valid_input = validate_input && validate_input(input);
     if (input == "" || !valid_input) {

@@ -1,4 +1,4 @@
-<div class="notify-popup shadow" <% if (untilNext) { %> data-until-next="true" <% } %>>
+<div class="notify-popup shadow" <% if (dismissID) { %> data-dismiss-id="<%- dismissID %>" <% } %>>
     <p class="notify-popup-header"><%- header %></p>
     <p class="notify-popup-message"><%- message %></p>
 </div>

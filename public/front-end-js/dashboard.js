@@ -6,6 +6,8 @@ function setAccount(acc) {
 }
 
 $(document).ready(function() {
+  console.log(JSON.stringify(getActiveContractAddresses()));
+  $("#cookie-contents").text(JSON.stringify(getActiveContractAddresses()));
 
   const TradingAccount = web3.eth.contract(TradingAccountABI);
   //TODO(moezinia) turn on!

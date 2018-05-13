@@ -148,7 +148,7 @@ maturityTime = optionSmartContract.maturityTime.call(
 
 
 function getUserOptionInfo() {
-  scAddresses = retrieveUserSpecificSCAddresses()
+  scAddresses = getActiveContractAddresses()
   userOptionInfo = getOptionInfo(scAddresses);
   return userOptionInfo;
 }

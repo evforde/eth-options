@@ -42,18 +42,20 @@
 </div>
 
 <script>
-function showNotifyPopup(header, message, untilNext) {
-  let oldMessages = $("#notify-popup-window .notify-popup[data-until-next=\"true\"]");
-  oldMessages.animate({ "opacity": "0", "left": "36px" }, 100); 
-  setTimeout(function() { oldMessages.remove(); }, 200);
+function showNotifyPopup(header, message, dismissID, persistent) {
+  if (dismissID) {
+    let oldMessage = $("#notify-popup-window .notify-popup[data-dismiss-id=\"" + dismissID + "\"]");
+    oldMessage.animate({ "opacity": "0", "left": "36px" }, 100); 
+    setTimeout(function() { oldMessage.remove(); }, 200);
+  }
   $.get('/static/ejs/notify-popup-item.ejs', function (template) {
       var messageTemplate = ejs.compile(template);
-      var msg = $(messageTemplate({ header, message, untilNext }));
+      var msg = $(messageTemplate({ header, message, dismissID }));
       $("#notify-popup-window").prepend(msg);
       msg.animate({ "opacity": "1", "left": "0" }, 100);
       // If we don't want this popup to persist until the next message is shown,
       // allow dismissal by clicking and automatically dismiss after 8 seconds
-      if (!untilNext) {
+      if (!persistent) {
         msg.click(function(e) {
             $(this).animate({ "opacity": "0", "left": "36px" }, 100); 
             setTimeout(function(t) { return function() { t.remove(); } }($(this)), 200);

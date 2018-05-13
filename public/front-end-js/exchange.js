@@ -37,7 +37,7 @@ function rebindEventHandlers() {
   $("#options .option-item:not(#current-price-marker)").click(function() {
     let strike = $(this).attr("data-strike");
     // TODO(eforde): redirect to proper trade page
-    window.location = "/trade?strike=" + strike + "&date=5/5";
+    window.location = "/trade?strike=" + strike + "&date=5/21/18";
   });
 }
 

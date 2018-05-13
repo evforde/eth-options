@@ -1,36 +1,26 @@
-// -------storing option Objects in browser cookie"
+/*
+  Used to get and set cookies containg active contract addresses
+ */
 
-function getCookie(cookieName="optionInfo") {
-    var name = cookieName + "=";
-    var decodedCookie = decodeURIComponent(document.cookie);
-    var ca = decodedCookie.split(';');
-    for(var i = 0; i <ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0) == ' ') {
-            c = c.substring(1);
-        }
-        if (c.indexOf(name) == 0) {
-            return c.substring(name.length, c.length);
-        }
-    }
-    return "";
-}
-
-function retrieveUserSpecificSCAddresses() {
-
-  existingCookie = JSON.parse(getCookie("optionInfo"));
-  scAddressesToQuery = []
-  optionObjs = existingCookie["optionInformation"].optionInformation;
-  // for now query smart contract..
-  for (var i = 0; i < optionObjs.length; i++) {
-    scAddressesToQuery.push(optionObjs[i]["contractAddress"]);
+function getCookie(cookieName="active_contracts") {
+  let name = cookieName + "=";
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(';');
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i].trimLeft();
+    if (c.indexOf(name) == 0)
+      return c.substring(name.length, c.length);
   }
-  return scAddressesToQuery;
+  return "";
+}
+
+function getActiveContractAddresses() {
+  let currentCookie = getCookie("active_contracts");
+  return currentCookie ? JSON.parse(currentCookie) : [];
 }
 
 
-function setBrowserCookie(optionObj) {
-
+function saveActiveContractAddress(addr) {
   // use jquery to set
   // $.cookie('name', 'value', { expires: 7, path: '/' }); // 7 days
   // and read
@@ -39,17 +29,18 @@ function setBrowserCookie(optionObj) {
 
 
   // set cookie if does not exist
-  if (getCookie("optionInfo") == "") {
-    cookieInfo = {optionInformation: new Array(optionObj)};
+  let currentCookie = getCookie("active_contracts");
+  if (currentCookie == "") {
+    let newCookie = [addr];
     //TODO(moezinia) change expiration to optionObj.cancellationTime
-    document.cookie = "optionInfo="+JSON.stringify(cookieInfo)+"; expires=Wed, 01 Jan 2030 00:00:00 UTC; path=/dashboard;";
+    document.cookie = "active_contracts=" + JSON.stringify(newCookie) + 
+                      "; expires=Wed, 01 Jan 2030 00:00:00 UTC; path=/;";
   }
   // append another option to cookie
   else {
-    existingCookie = JSON.parse(getCookie("optionInfo"));
-    existingCookie["optionInformation"].push(optionObj);
-    cookieInfo = {optionInformation: existingCookie}
-    document.cookie = "optionInfo="+JSON.stringify(cookieInfo)+"; expires=Wed, 01 Jan 2020 00:00:00 UTC; path=/dashboard;";
+    let newCookie = JSON.parse(currentCookie);
+    newCookie.push(addr);
+    document.cookie = "active_contracts=" + JSON.stringify(newCookie) + 
+                      "; expires=Wed, 01 Jan 2020 00:00:00 UTC; path=/;";
   }
-
 }

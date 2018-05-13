@@ -33,6 +33,9 @@ contract Option {
     uint _maturityTime, uint _cancellationTime,
     uint _premiumAmount, bool _traderType) public payable {
     require(_optionType == false); // Only allow calls
+    require(_maturityTime > block.timestamp);
+    require(_cancellationTime > block.timestamp);
+    require(_cancellationTime <= _maturityTime);
     // set optionBuyer/optionSeller based on optionCreatorType
     if (_traderType) {
       require(msg.value >= _premiumAmount);
@@ -55,15 +58,16 @@ contract Option {
     require(!isActive);
     require(traderType == !optionCreatorType);
     require(block.timestamp < cancellationTime); // TODO(eforde): otherwise cancel
+    // TODO(eforde): probably don't let people engage on contracts with themself    
     if (traderType) { // buyer
       require(address(this).balance > underlyingAmount);
-      require(msg.value == premiumAmount);
+      require(msg.value >= premiumAmount);
       require(optionSeller != 0);
       optionBuyer = msg.sender;
     }
     else { // seller
       require(address(this).balance > premiumAmount);
-      require(msg.value == underlyingAmount);
+      require(msg.value >= underlyingAmount);
       require(optionBuyer != 0);
       optionSeller = msg.sender;
     }
@@ -109,6 +113,10 @@ contract Option {
     require(msg.sender == optionSeller);
     require(block.timestamp > maturityTime);
     selfdestruct(msg.sender);
+  }
+
+  function getBalance() public view returns (uint) {
+    return address(this).balance; // TODO(eforde): remove this method
   }
 
 
