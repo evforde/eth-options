@@ -15,43 +15,43 @@ const fallbackValues = {
   gasPrice: gasPrice
 }
 
-function addToOrderBook(optionSmartContract, maturityDate, strikePrice) {
-  // fallbackValues.from = optionSmartContract;
-  alert("adding to order book");
-  orderBookContractInstance.addOption(optionSmartContract, fallbackValues,
-    (err, txnHash) => {
-      onMined(txnHash, res => {
-        if (res.success) {
-          alert("Option Added To Order Book");
-        }
-        else {
-          alert("can't add to OB");
-        }
-      });
-    });
-}
+// function addToOrderBook(optionSmartContract, maturityDate, strikePrice) {
+//   // fallbackValues.from = optionSmartContract;
+//   alert("adding to order book");
+//   orderBookContractInstance.addOption(optionSmartContract, fallbackValues,
+//     (err, txnHash) => {
+//       onMined(txnHash, res => {
+//         if (res.success) {
+//           alert("Option Added To Order Book");
+//         }
+//         else {
+//           alert("can't add to OB");
+//         }
+//       });
+//     });
+// }
 
-function removeFromOrderBook(optionSmartContract) {
-
-  fallbackValues.from = optionSmartContract;
-  // can put back args..maturityDate, strikePrice, optionSmartContract
-  orderBookContractInstance.deleteActivatedOption(optionSmartContract, fallbackValues,
-      (err, txnHash) => {
-      onMined(txnHash, res => {
-        if (res.success) {
-          showNotifyPopup(
-            "Option Deleted From Order Book",
-            "Done",
-            txnHash,
-            false
-          );
-        }
-        else {
-          alert("can't delete form OB");
-        }
-      });
-  });
-}
+// function removeFromOrderBook(optionSmartContract) {
+//
+//   fallbackValues.from = optionSmartContract;
+//   // can put back args..maturityDate, strikePrice, optionSmartContract
+//   orderBookContractInstance.deleteActivatedOption(optionSmartContract, fallbackValues,
+//       (err, txnHash) => {
+//       onMined(txnHash, res => {
+//         if (res.success) {
+//           showNotifyPopup(
+//             "Option Deleted From Order Book",
+//             "Done",
+//             txnHash,
+//             false
+//           );
+//         }
+//         else {
+//           alert("can't delete form OB");
+//         }
+//       });
+//   });
+// }
 
 
 function getInactiveOptionInfo(maturityDate, strikePriceUSD, cb) {
@@ -67,7 +67,7 @@ function getInactiveOptionInfo(maturityDate, strikePriceUSD, cb) {
   //   }
   // );
 
-  orderBookContractInstance.queryOrderBook.call(maturityDate, strikePriceUSD, fallbackValues,
+  orderBookContractInstance.queryOrderBook(maturityDate, strikePriceUSD, fallbackValues,
     (err, res) => {
       if (err) {
         alert('query error');

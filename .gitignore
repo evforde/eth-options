@@ -6,3 +6,4 @@ public/pre-js/
 public/pre-css/
 build
 ipfs/*
+public/contracts/*

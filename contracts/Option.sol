@@ -2,6 +2,8 @@ pragma solidity ^0.4.0;
 
 contract OrderBook {
   function addOption(address optionAddr, uint maturityTime, uint strikePriceUSD) public {}
+  function deleteActivatedOption(address optionAddr, uint maturityTime, uint strikePriceUSD) public {}
+  function queryOrderBook(uint maturityTime, uint strikePriceUSD) public {}
 }
 
 contract Option {
@@ -60,7 +62,7 @@ contract Option {
     OrderBook(orderBookAddress).addOption(address(this), maturityTime, strikePriceUSD);
   }
 
-  function activateContract(bool traderType) payable public {
+  function activateContract(bool traderType, address orderBookAddress) payable public {
     require(!isActive);
     require(traderType == !optionCreatorType);
     require(block.timestamp < cancellationTime); // TODO(eforde): otherwise cancel
@@ -79,9 +81,7 @@ contract Option {
     }
     isActive = true;
     optionSeller.transfer(premiumAmount);
-    emit LogTransferMade(optionBuyer, optionSeller, premiumAmount);
-
-    // TODO(eforde): verify not susceptible to reentry
+    OrderBook(orderBookAddress).deleteActivatedOption(address(this), maturityTime, strikePriceUSD);
   }
 
   function exerciseExternalPrice (uint _currentETHPrice) public {

@@ -152,6 +152,7 @@ function bindEventHandlers() {
           // Prompt the user to send the collateral to the smart contract
           optionContract.activateContract(
             false,
+            orderBookAddress,
             { value: 1e18, gas: 2e5 },
             (err, txnHash) => {
               if (err) {
