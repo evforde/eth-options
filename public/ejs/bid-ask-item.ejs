@@ -1,9 +1,11 @@
-<div class="bid-ask-item" data-party-address="<%= partyAddress %>" data-contract-address="<%= contractAddress %>" data-premium="<%= premium %>">
+<div class="bid-ask-item" data-party-address="<%= partyAddress %>"
+  data-contract-address="<%= contractAddress %>" data-premium="<%= premium %>">
   <div class="party-info">
-    <p class="address"><%= partyAddress %></p>
-    <p class="party-type"><%= partyType %></p>
+    <p class="address"><%= contractAddress %></p>
+    <p class="party-type">contract address</p>
   </div>
+  <% if (partyType) { sign = "+"; } else { sign = "-"; } %>
   <div class="premium-info">
-    <p><%= premium.toFixed(2) %>ETH</p>
+    <p> <%=sign + premium.toFixed(2)%> ETH</p>
   </div>
 </div>

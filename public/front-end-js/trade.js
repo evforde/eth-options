@@ -116,7 +116,6 @@ $(document).ready(function() {
 function insertByPrice(bidOrAsk, optionItem) {
   let list = bidOrAsk ? "#bids" : "#asks";
   let comparisonFunc = (a, b) => { return bidOrAsk ? a < b : b < a; };
-
   let newRow = bidAskTemplate(optionItem);
   let inserted = false;
   $(list + " .bid-ask-item").each(function(i, oldRow) {
@@ -140,7 +139,7 @@ function bindEventHandlers() {
     let premium = $(this).attr("data-premium");
     showPopup(
       "Sell " + date + " $" + strike + " call",
-      "You will immediately receive the " + premium + "ETH premium and will " + 
+      "You will immediately receive the " + premium + "ETH premium and will " +
       "immediately pay 1 ETH as collateral. The contract is deployed at " +
       contractAddress + ".",
       // TODO(eforde)

@@ -12,12 +12,9 @@ contract OrderBook {
       orderbookmap[1][1] = [0x0];
   }
 
-  /* function addOption(uint maturityDate,
-    uint strikePrice, address optionSmartContract) public { */
-
-    function addOption() public {
-    uint maturityD = Option(msg.sender).maturityTime();
-    uint strike = Option(msg.sender).strikePriceUSD();
+  function addOption(address optionAddr) public {
+    uint maturityD = Option(optionAddr).maturityTime();
+    uint strike = Option(optionAddr).strikePriceUSD();
     orderbookmap[maturityD][strike].push(msg.sender);
   }
 
