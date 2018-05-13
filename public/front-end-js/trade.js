@@ -27,6 +27,9 @@ var contractAddresses = [
   "0x9337aefe88171badf438f0ca163e056bb02221b0",
   "0x40ccb21d59cb79a3accdbbd7fb66175b1477f5e4",
   "0xf09c80dca93ac3a78c69ba940a3369e38eda5a6b",
+  "0xdde23dee545b49c8f4097b27e2a49f39086e7f25",
+  "0xa7b92bc31a624d7fe2bc432dee7fa61141d239a8",
+  "0x389e05bd011e965df7a5f2614461c9845247002c",
 ];
 
 // We can test canceling with these
@@ -40,29 +43,33 @@ var oldContractsToCancel = [
 
 var bidAskTemplate;
 
+function renderOption(contractAddress) {
+  loadOption(contractAddress, (option) => {
+    // Insertion sort contract into DOM
+    let currentTime = new Date().getTime() / 1000;
+    if (option.isActive || option.cancellationTime <= currentTime) {
+      console.log("Omitting canceled or activated contract: ", option);
+      return;  // Don't include already active options or cancelled contracts
+    }
+    let bidOrAsk = option.optionCreatorType;
+    let optionItem = {
+      partyAddress: bidOrAsk ? option.optionBuyer : option.optionSeller,
+      partyType: bidOrAsk ? "buyer" : "seller",
+      contractAddress: option.addr,
+      premium: option.premiumAmount / 1e18
+    }
+    insertByPrice(bidOrAsk, optionItem);
+    bindEventHandlers();
+  });
+}
+
 $(document).ready(function() {
   OptionContract = web3.eth.contract(OptionContractABI);
 
   $.get('/static/ejs/bid-ask-item.ejs', function (template) {
     bidAskTemplate = ejs.compile(template);
     for (let i in contractAddresses) {
-      loadOption(contractAddresses[i], (option) => {
-        // Insertion sort contract into DOM
-        let currentTime = new Date().getTime() / 1000;
-        if (option.isActive || option.cancellationTime <= currentTime) {
-          console.log("Omitting canceled or activated contract: ", option);
-          return;  // Don't include already active options or cancelled contracts
-        }
-        let bidOrAsk = option.optionCreatorType;
-        let optionItem = {
-          partyAddress: bidOrAsk ? option.optionBuyer : option.optionSeller,
-          partyType: bidOrAsk ? "buyer" : "seller",
-          contractAddress: option.addr,
-          premium: option.premiumAmount / 1e18
-        }
-        insertByPrice(bidOrAsk, optionItem);
-        bindEventHandlers();
-      });
+      renderOption(contractAddresses[i]);
     }
   });
 
@@ -308,6 +315,7 @@ function deployOptionContract(premium, traderType) { // true = buyer, false = se
             premiumWei
           );
           saveActiveContractAddress(data.address);
+          renderOption(data.address);
           // TODO(eforde): store in order book
           console.log("successfully deployed contract at ", data.address);
         }

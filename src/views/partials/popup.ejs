@@ -115,7 +115,7 @@
 var popup_callback;
 var validate_input;
 
-function showPopup(header, msg, inputname, _validate_input, _popup_callback) {
+function showPopup(header, msg, inputname, _validate_input, _popup_callback, height) {
   validate_input = _validate_input;
   popup_callback = _popup_callback;
   $("#header").text(header);
@@ -132,6 +132,9 @@ function showPopup(header, msg, inputname, _validate_input, _popup_callback) {
     $("#popup-input").css("visibility", "collapse");
     $("#popup-input").css("display", "none");
     $("#popup").css("height", "200px");
+  }
+  if (height) {
+    $("#popup").css("height", height + "px");
   }
   $('#popup-dimmer').addClass('shown');
   $("#popup-input").focus();

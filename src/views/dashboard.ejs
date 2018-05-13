@@ -6,78 +6,38 @@
   <script src="https://unpkg.com/ipfs-api@9.0.0/dist/index.js"
   integrity="sha384-5bXRcW9kyxxnSMbOoHzraqa7Z0PQWIao+cgeg327zit1hz5LZCEbIMx/LWKPReuB"
   crossorigin="anonymous"></script>
+  <script src="/static/front-end-js/lib/ejs.min.js"></script>
   <script src="/static/front-end-js/lib/jquery-3.3.1.min.js"></script>
-  <script src="/static/front-end-js/create-option.js"></script>
   <script src="/static/front-end-js/cookies.js"></script>
   <script src="/static/front-end-js/delete-option-contract.js"></script>
   <script src="/static/front-end-js/exercise-option.js"></script>
   <script src="/static/front-end-js/dashboard.js"></script>
-  <script src="/static/front-end-js/query-option-smart-contract.js"></script>
-  <script src="/static/front-end-js/load-user-options.js"></script>
   <script src="/static/front-end-js/eth-price.js"></script>
   <link rel="stylesheet" type="text/css" href="/static/css/shared.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/dashboard.css">
   <script>
-    const TradingAccountABI = JSON.parse('<%= tradingAccountABI %>'.replace(/&#34;/g, "\"").slice(1, -1));
-    // TODO(eforde): only include this if no trading account for current user
-    const TradingAccountBinary = decodeURIComponent('<%= tradingAccountBinary %>');
     const OptionContractABI = JSON.parse('<%= optionContractABI %>'.replace(/&#34;/g, "\"").slice(1, -1));
   </script>
 </head>
 
 <body>
+  <% include ./partials/popup %>
   <% include ./partials/header %>
 
   <div id="page">
     <div class="container">
       <div class="content">
         <h1>Hello, <%= user %>!</h1>
-        <p>Your orders:</p>
-        <p id="cookie-contents"></p>
-        <p>Create your trading account:</p>
-        <span id="make-account" class="btn" style="font-size: 24px;">make a new trading account</span>
       </div>
     </div>
     <div class="container">
       <div class="content">
-        <p>
-          Home:
-          Create Option Contract Here: or in trade tab?
-        </p>
-
-
-        <div class="container">
-          <div id="user-option-content" class="user-content">
-            Your Options
-            <div id="user-active-options"> Your Active Options
-            </div>
-            <div id="user-inactive-options"> Your Inactive Options
-            </div>
-          </div>
+        <h2>Active orders</h2>
+        <div id="active-orders">
         </div>
-
-
-
-
-        <div class="createOptionRow">
-          <div id="maturiy">2019:01:01</div>
-          <div id="ETHStrikePrice">$1000</div>
-          <div id="premiumPrice">$10</div>
-          <div id="offerExpiry">2018:08:02</div>
-          <div id="numberETH">3</div>
-          <button id="createOptionOffer">Create Bid</button>
+        <h2 id="pending-orders-header">Pending orders</h2>
+        <div id="pending-orders">
         </div>
-
-        <div class="acceptOptionRow">
-          <div id="optionObject">option info rendered here</div>
-          <button id="acceptOptionOffer">Accept Bid</button>
-        </div>
-
-        <div class="exerciseOption">
-          <button id="exerciseOptionOffer">Exercise!</button>
-        </div>
-
-
-
       </div>
     </div>
   </div>

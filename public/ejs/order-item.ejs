@@ -1,0 +1,15 @@
+<div class="order-item <%= isActive ? "" : "pending" %>" <%= canExercise ? "data-can-exercise=\"true\"" : "" %> data-contract-address="<%= addr %>" data-premium="<%= premiumAmount %>">
+  <div class="header-info">
+    <p class="description"><%= maturityTime %> $<%= strikePriceUSD %> Call</p>
+    <p class="position"><%= position %> - <%= premiumAmount %> ETH premium <%= isActive ? "" : ("- order expires " + cancellationTime) %></p>
+  </div>
+  <% if (isActive) { %>
+  <div class="action <%= canExercise ? "active" : "" %>">
+    <p>exercise</p>
+  </div>
+  <% } else { %>
+  <div class="action red">
+    <p>cancel</p>
+  </div>
+  <% } %>
+</div>

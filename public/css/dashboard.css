@@ -1,0 +1,72 @@
+#pending-orders-header {
+  margin-top: 24px;
+}
+#active-orders, #pending-orders {
+  border-bottom: 1px solid #aaa !important;
+}
+.order-item {
+  height: 60px;
+  width: 100%;
+  border-top: 1px solid #aaa !important;
+  transition: .2s;
+  cursor: pointer !important;
+  overflow: hidden;
+}
+.order-item:hover {
+  background: #eee;
+  opacity: 1 !important;
+}
+.order-item > * {
+  height: 60px;
+  float: left;
+}
+.order-item .header-info {
+  transition: .2s;
+  width: calc(100% - 82px);
+  position: relative;
+  top: 10px;
+}
+.order-item .header-info .description {
+  font-size: 20px;
+  color: #333;
+  font-size: 18px;
+  white-space: nowrap;
+  max-width: 80%;
+  overflow: hidden;
+  height: 30px;
+}
+.order-item .header-info .position {
+  font-size: 12px;
+  text-transform: lowercase;
+  letter-spacing: 1px;
+  color: #aaa;
+}
+.order-item .action {
+  width: 80px;
+  position: relative;
+  left: 80px;
+  background-color: #d9d9d9;
+  font-size: 18px;
+  padding-right: 2px;
+  transition: .2s;
+  overflow: hidden;
+  text-align: center;
+}
+.order-item:hover .action {
+  left: 0px;
+}
+.order-item .action p {
+  color: #aaa;
+  margin-top: 22px;
+  font-size: 14px;
+}
+.order-item .action.active {
+  background-color: #4e4e9d;
+}
+.order-item .action.red {
+  background-color: rgb(218, 44, 44);
+}
+.order-item .action.red p, .order-item .action.active p {
+  color: #fff;
+  margin-left: 2px;
+}
