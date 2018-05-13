@@ -1,5 +1,9 @@
 pragma solidity ^0.4.0;
 
+contract OrderBook {
+  function addOption(address optionAddr, uint maturityTime, uint strikePriceUSD) public {}
+}
+
 contract Option {
   uint constant public underlyingAmount = 1e18; // 1 eth in wei
 
@@ -31,7 +35,8 @@ contract Option {
 
   constructor(bool _optionType, uint _strikePriceUSD,
     uint _maturityTime, uint _cancellationTime,
-    uint _premiumAmount, bool _traderType) public payable {
+    uint _premiumAmount, bool _traderType,
+    address orderBookAddress) public payable {
     require(_optionType == false); // Only allow calls
     require(_maturityTime > block.timestamp);
     require(_cancellationTime > block.timestamp);
@@ -52,13 +57,14 @@ contract Option {
     premiumAmount = _premiumAmount;
     cancellationTime = _cancellationTime;
     isActive = false;
+    OrderBook(orderBookAddress).addOption(address(this), maturityTime, strikePriceUSD);
   }
 
   function activateContract(bool traderType) payable public {
     require(!isActive);
     require(traderType == !optionCreatorType);
     require(block.timestamp < cancellationTime); // TODO(eforde): otherwise cancel
-    // TODO(eforde): probably don't let people engage on contracts with themself    
+    // TODO(eforde): probably don't let people engage on contracts with themself
     if (traderType) { // buyer
       require(address(this).balance > underlyingAmount);
       require(msg.value >= premiumAmount);

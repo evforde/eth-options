@@ -15,6 +15,7 @@
     const strike = <%= strike %>;
     const OptionContractABI = JSON.parse('<%= optionContractABI %>'.replace(/&#34;/g, "\"").slice(1, -1));
     const OptionContractBinary = decodeURIComponent('<%= optionContractBinary %>');
+    const OrderBookABI = JSON.parse('<%= orderBookABI %>'.replace(/&#34;/g, "\"").slice(1, -1));
   </script>
 </head>
 <body>

@@ -42,6 +42,7 @@ var oldContractsToCancel = [
 ];
 
 var bidAskTemplate;
+// const orderBookAddress = "0x743EfAD0CC1c2BB75704671fe6B2F6911E9d1eAE";
 
 function renderOption(contractAddress) {
   loadOption(contractAddress, (option) => {
@@ -280,6 +281,7 @@ function deployOptionContract(premium, traderType) { // true = buyer, false = se
       cancellationTime,
       premiumWei,
       traderType,
+      orderBookAddress,
       {
         data: OptionContractBinary,
         from: account,
@@ -315,12 +317,12 @@ function deployOptionContract(premium, traderType) { // true = buyer, false = se
           );
           saveActiveContractAddress(data.address);
           renderOption(data.address);
-          // TODO(eforde): store in order book
+          // store in order book
+          // addToOrderBook(data.address, null, null);
           console.log("successfully deployed contract at ", data.address);
         }
     });
   });
-
 }
 
 // Returns transaction receipt and whether transaction was successful upon

@@ -1,5 +1,4 @@
 pragma solidity ^0.4.0;
-import './Option.sol';
 
 contract OrderBook {
 
@@ -9,12 +8,11 @@ contract OrderBook {
   event ConsoleLog(string description);
 
   constructor() public {
-      orderbookmap[1][1] = [0x0];
   }
 
-  function addOption(address optionAddr) public {
-    uint maturityD = Option(optionAddr).maturityTime();
-    uint strike = Option(optionAddr).strikePriceUSD();
+  function addOption(address optionAddr, uint maturityD, uint strike) public {
+    /* uint maturityD = Option(optionAddr).maturityTime(); */
+    /* uint strike = Option(optionAddr).strikePriceUSD(); */
     orderbookmap[maturityD][strike].push(msg.sender);
   }
 
@@ -23,9 +21,9 @@ contract OrderBook {
       return orderbookmap[maturityDate][strikePrice];
   }
 
-  function deleteActivatedOption() public {
-      uint maturityD = Option(msg.sender).maturityTime();
-      uint strike = Option(msg.sender).strikePriceUSD();
+  function deleteActivatedOption(address optionAddr, uint maturityD, uint strike) public {
+      /* uint maturityD = Option(msg.sender).maturityTime(); */
+      /* uint strike = Option(msg.sender).strikePriceUSD(); */
       for (uint i = 0; i < orderbookmap[maturityD][strike].length; i++) {
         if (orderbookmap[maturityD][strike][i] == msg.sender) {
           delete orderbookmap[maturityD][strike][i];

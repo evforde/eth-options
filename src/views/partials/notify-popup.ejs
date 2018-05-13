@@ -45,7 +45,7 @@
 function showNotifyPopup(header, message, dismissID, persistent) {
   if (dismissID) {
     let oldMessage = $("#notify-popup-window .notify-popup[data-dismiss-id=\"" + dismissID + "\"]");
-    oldMessage.animate({ "opacity": "0", "left": "36px" }, 100); 
+    oldMessage.animate({ "opacity": "0", "left": "36px" }, 100);
     setTimeout(function() { oldMessage.remove(); }, 200);
   }
   $.get('/static/ejs/notify-popup-item.ejs', function (template) {
@@ -57,11 +57,11 @@ function showNotifyPopup(header, message, dismissID, persistent) {
       // allow dismissal by clicking and automatically dismiss after 8 seconds
       if (!persistent) {
         msg.click(function(e) {
-            $(this).animate({ "opacity": "0", "left": "36px" }, 100); 
+            $(this).animate({ "opacity": "0", "left": "36px" }, 100);
             setTimeout(function(t) { return function() { t.remove(); } }($(this)), 200);
         });
-        setTimeout(function(t) { return function() { 
-            t.animate({ "opacity": "0", "left": "36px" }, 100); 
+        setTimeout(function(t) { return function() {
+            t.animate({ "opacity": "0", "left": "36px" }, 100);
             setTimeout(function(t) { return function() { t.remove(); } }(t), 200);
         }; }(msg), 8000);
       }

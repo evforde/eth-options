@@ -98,7 +98,8 @@ router.get("/trade", function(req, res, next) {
     strike: req.query.strike,
     date: req.query.date,
     optionContractABI: optionContractABI,
-    optionContractBinary: optionContractBinary
+    optionContractBinary: optionContractBinary,
+    orderBookABI: orderBookABI
   });
 });
 
