@@ -16,10 +16,6 @@
   <script src="/static/front-end-js/load-unactivated-options.js"></script>
   <link rel="stylesheet" type="text/css" href="/static/css/shared.css">
   <link rel="stylesheet" type="text/css" href="/static/css/exchange.css">
-  <script>
-  const OrderBookABI = JSON.parse('<%= optionContractABI %>'.replace(/&#34;/g, "\"").slice(1, -1));
-  const OrderBookBinary = decodeURIComponent('<%= optionContractBinary %>');
-  </script>
 </head>
 <body>
   <% include ./partials/header %>
