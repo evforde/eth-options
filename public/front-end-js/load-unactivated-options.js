@@ -1,8 +1,5 @@
 // ----fetches all relevant options to display on trade-------
 
-var date;
-var strike;
-
 //TODO(eforde)
 $(document).ready(function() {
 
@@ -25,7 +22,7 @@ $(document).ready(function() {
         $("body").animate({ scrollTop: $(document).height() }, 700);
       });
     });
-}
+});
 
 
 function renderInactiveOptions(maturityDate, strikePriceUSD) {

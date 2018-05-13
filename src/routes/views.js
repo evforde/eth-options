@@ -75,6 +75,7 @@ router.get("/dashboard", function(req, res, next) {
   // console.log("ABI:", tradingAccountABI);
   res.render("dashboard", {
     user: req.user,
+    optionContractABI: optionContractABI,
     tradingAccountABI: tradingAccountABI,
     tradingAccountBinary: tradingAccountBinary
   });
@@ -82,7 +83,9 @@ router.get("/dashboard", function(req, res, next) {
 
 router.get("/exchange", function(req, res, next) {
   res.render("exchange", {
-    user: req.user
+    user: req.user,
+    orderBookABI: orderBookABI,
+    orderBookBinary: orderBookBinary
   });
 });
 

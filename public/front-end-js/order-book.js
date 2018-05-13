@@ -1,8 +1,14 @@
 const maxGasProvided = 1000000; //gas limit max 4665264   860444 used for create/deposit!
 const gasPrice = "20000000000"; // 20 Gwei (next few blocks ~ few seconds)
 const orderBookAddress = "0x.."
-const orderBookContract = web3.eth.contract(OrderBookABI, null, fallbackValues);
-const orderBookContractInstance = orderBookContract.at(orderBookAddress);
+var orderBookContract;
+var orderBookContractInstance;
+
+$(document).ready(() => {
+  orderBookContract = web3.eth.contract(OrderBookABI, null, fallbackValues);
+  orderBookContractInstance = orderBookContract.at(orderBookAddress);
+});
+
 const fallbackValues = {
   // data: OptionContractBinary,
   gas: maxGasProvided,
