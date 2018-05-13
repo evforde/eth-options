@@ -55,7 +55,7 @@ function renderOption(contractAddress) {
     let bidOrAsk = option.optionCreatorType;
     let optionItem = {
       partyAddress: bidOrAsk ? option.optionBuyer : option.optionSeller,
-      partyType: bidOrAsk ? "buyer" : "seller",
+      partyType: bidOrAsk,
       contractAddress: option.addr,
       premium: option.premiumAmount / 1e18
     }
@@ -141,8 +141,7 @@ function bindEventHandlers() {
     showPopup(
       "Sell " + date + " $" + strike + " call",
       "You will immediately receive the " + premium + "ETH premium and will " +
-      "immediately pay 1 ETH as collateral. The contract is deployed at " +
-      contractAddress + ".",
+      "immediately pay 1 ETH as collateral.",
       // TODO(eforde)
       null,
       null,
@@ -206,7 +205,7 @@ function bindEventHandlers() {
       "Buy " + date + " $" + strike + " call",
       "You will immediately pay the " + premium + "ETH premium " +
       "and will have the right to exercise your option if it is in the money " +
-      "before expiry. The contract is deployed at " + contractAddress + ".",
+      "before expiry.",
       null,
       null,
       function(resp) {
