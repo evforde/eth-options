@@ -1,8 +1,9 @@
 // dependencies
-const express = require("express");
-const router  = express.Router();
-const solc    = require("solc");
-const fs      = require("fs");
+const express  = require("express");
+const router   = express.Router();
+const solc     = require("solc");
+const fs       = require("fs");
+const ethPrice = require("../back-end-js/eth-price.js");
 
 //
 // setup
@@ -19,6 +20,8 @@ var optionContractABI;
 var optionContractBinary;
 var orderBookBinary;
 var orderBookABI;
+
+
 
 fs.readFile("./public/contracts/__contracts_TradingAccount_sol_TradingAccount.abi", "ascii", function(err, data) {
   if (err)
@@ -58,13 +61,14 @@ fs.readFile("./public/contracts/__contracts_OrderBook_sol_OrderBook.abi", "ascii
 
 
 
-
 //
 // views
 //
 
 router.get("/", function(req, res, next) {
-  res.render("index");
+  res.render("index", {
+    ethPrice: ethPrice.getEthPrice()
+  });
 });
 
 router.get("/index", function(req, res, next) {
@@ -77,7 +81,8 @@ router.get("/dashboard", function(req, res, next) {
     user: req.user,
     optionContractABI: optionContractABI,
     tradingAccountABI: tradingAccountABI,
-    tradingAccountBinary: tradingAccountBinary
+    tradingAccountBinary: tradingAccountBinary,
+    ethPrice: ethPrice.getEthPrice()
   });
 });
 
@@ -85,7 +90,8 @@ router.get("/exchange", function(req, res, next) {
   res.render("exchange", {
     user: req.user,
     orderBookABI: orderBookABI,
-    orderBookBinary: orderBookBinary
+    orderBookBinary: orderBookBinary,
+    ethPrice: ethPrice.getEthPrice()
   });
 });
 
@@ -99,16 +105,10 @@ router.get("/trade", function(req, res, next) {
     date: req.query.date,
     optionContractABI: optionContractABI,
     optionContractBinary: optionContractBinary,
-    orderBookABI: orderBookABI
+    orderBookABI: orderBookABI,
+    ethPrice: ethPrice.getEthPrice()
   });
 });
-
-router.get("/unfulfilled", function(req, res, next) {
-  // could add authentication here... if authetnicated:
-  res.render("unfulfilled_options", { user: req.user });
-});
-
-
 
 
 module.exports = router;

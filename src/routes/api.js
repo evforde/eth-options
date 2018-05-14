@@ -5,6 +5,7 @@ const router = express.Router();
 // local dependencies
 // const IPFS = require("../back-end-js/IPFS.js");
 const auth = require("../back-end-js/metamask-auth.js");
+const ethPrice = require("../back-end-js/eth-price.js");
 
 // GETs
 

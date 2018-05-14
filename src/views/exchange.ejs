@@ -17,6 +17,7 @@
   <script>
   const OrderBookABI = JSON.parse('<%= orderBookABI %>'.replace(/&#34;/g, "\"").slice(1, -1));
   const OrderBookBinary = decodeURIComponent('<%= orderBookBinary %>');
+  var currentETHPriceUSD = '<%= ethPrice %>';
   </script>
 </head>
 <body>

@@ -4,7 +4,6 @@ $(document).ready(function() {
 
   $("#exerciseOptionOffer").click(function() {
 
-
     getMetamaskAccount(function(optionExerciser) {
 
       const maxGasProvided = 1000000; //gas limit max 4665264   860444 used for create/deposit!
@@ -25,74 +24,17 @@ $(document).ready(function() {
       const optionContract = web3.eth.contract(OptionContractABI, null, fallbackValues);
       const optionSmartContract = optionContract.at(smartContractAddress);
 
-      getETHPrice((curEthPrice) => {
-        optionSmartContract.exerciseExternalPrice(curEthPrice, fallbackValues,
-          (err, res) => {
-            if (err) {
-              console.log("error exercise");
-            }
-            else {
-              txnHash = res.toString();
-              console.log("hash is ", txnHash);
-
-              const interval = 2000;
-              const blockLimit = 95;
-              prom = getTransactionReceiptMined(txnHash, interval, blockLimit);
-
-              prom.then(function(receipt) {
-                if (receipt.status == "0x1") {
-                  alert("Option Exercised!");
-                  console.log(optionObj.contractAddress, 'contract Address exercising');
-                  // TODO(moezinia) remove option from cookie
-                }
-                else {
-                  console.log("no way to debug on testnet");
-                  alert("Option Unable to be Exercised but txn mined (ie not in the money..)");
-                }
-              }, function(error) {
-                alert("Option Unable to be Exercised. Txn not mined");
-                console.log(error);
-              });
-            }
+      optionSmartContract.exerciseExternalPrice(currentETHPriceUSD, fallbackValues,
+      (err, res) => {
+        onMined(txnHash, res => {
+          if (res.success) {
+            alert('Exercised');
           }
-        )
+          else {
+            alert("can't exercise");
+          }
+        });
       });
-
-
-      // optionSmartContract.exercise(fallbackValues,
-      //   (err, res) => {
-      //     if (err) {
-      //       console.log(err);
-      //       alert("Error with contract activation", err);
-      //     }
-      //     else {
-      //       txnHash = res.toString();
-      //       console.log(txnHash);
-      //       // now txn pending..
-      //       const interval = 2000;
-      //       const blockLimit = 95;
-      //       prom = getTransactionReceiptMined(txnHash, interval, blockLimit);
-      //       prom.then(function(receipt) {
-      //         if (receipt.status == "0x1") {
-      //           alert("Option Exercised!");
-      //           console.log(optionObj.contractAddress, 'contract Address exercising');
-      //           // TODO(moezinia) remove option from cookie
-      //         }
-      //         else {
-      //           console.log("no way to debug on testnet");
-      //           alert("Option Unable to be Exercised but txn mined (ie not in the money..)");
-      //         }
-      //       }, function(error) {
-      //         alert("Option Unable to be Exercised. Txn not mined");
-      //         console.log(error);
-      //       });
-      //     }
-      //   });
-
-
-
     });
-
   });
-
 });

@@ -12,11 +12,11 @@
   <script src="/static/front-end-js/delete-option-contract.js"></script>
   <script src="/static/front-end-js/exercise-option.js"></script>
   <script src="/static/front-end-js/dashboard.js"></script>
-  <script src="/static/front-end-js/eth-price.js"></script>
   <link rel="stylesheet" type="text/css" href="/static/css/shared.css">
   <link rel="stylesheet" type="text/css" href="/static/css/dashboard.css">
   <script>
     const OptionContractABI = JSON.parse('<%= optionContractABI %>'.replace(/&#34;/g, "\"").slice(1, -1));
+    var currentETHPriceUSD = '<%= ethPrice %>';
   </script>
 </head>
 

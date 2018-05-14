@@ -8,13 +8,8 @@ function setAccount(acc) {
 }
 
 
-
 $(document).ready(function() {
   OptionContract = web3.eth.contract(OptionContractABI);
-
-  // getETHPrice((priceCents) => {
-  //   $("#eth-price-usd").text("The current price is $" + (priceCents/100).toString());
-  // });
 
   let userContracts = getActiveContractAddresses();
   getMetamaskAccount(function(account) {
@@ -39,15 +34,10 @@ $(document).ready(function() {
             );
             return;
           }
-
-          $.ajax()
-          getETHPrice((CURRENT_ETH_PRICE) => {
-            option.canExercise = CURRENT_ETH_PRICE >= (option.strikePriceUSD*100);
-            // TODO(eforde): insert options by maturity date
-            let list = option.isActive ? "#active-orders" : "#pending-orders";
-            $(list).append(orderItemTemplate(option));
-            bindEventHandlers();
-          });
+          option.canExercise = currentETHPriceUSD >= (option.strikePriceUSD*100);
+          let list = option.isActive ? "#active-orders" : "#pending-orders";
+          $(list).append(orderItemTemplate(option));
+          bindEventHandlers();
         });
       }
     });

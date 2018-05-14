@@ -1,9 +1,9 @@
 pragma solidity ^0.4.0;
 
 contract OrderBook {
-  function addOption(address optionAddr, uint maturityTime, uint strikePriceUSD) public {}
-  function deleteActivatedOption(address optionAddr, uint maturityTime, uint strikePriceUSD) public {}
-  function queryOrderBook(uint maturityTime, uint strikePriceUSD) public {}
+  function addOption(address optionAddr, uint maturityTime, uint strikePriceCents) public {}
+  function deleteActivatedOption(address optionAddr, uint maturityTime, uint strikePriceCents) public {}
+  function queryOrderBook(uint maturityTime, uint strikePriceCents) public {}
 }
 
 contract Option {
@@ -15,7 +15,7 @@ contract Option {
   bool public optionType;          // put = True, call = False.
   bool public optionCreatorType;   // buyer = True, seller = False.
 
-  uint public strikePriceUSD;
+  uint public strikePriceCents;
   uint public premiumAmount; // eth - wei in constructor
   uint public cancellationTime;
   uint public maturityTime;
@@ -35,7 +35,7 @@ contract Option {
   event LogTransferMade(address sender, address receiver, uint amount);
   event LogNewOraclizeQuery(string description);
 
-  constructor(bool _optionType, uint _strikePriceUSD,
+  constructor(bool _optionType, uint _strikePriceCents,
     uint _maturityTime, uint _cancellationTime,
     uint _premiumAmount, bool _traderType,
     address orderBookAddress) public payable {
@@ -54,12 +54,12 @@ contract Option {
     }
     optionCreatorType = _traderType;
     optionType = _optionType;
-    strikePriceUSD = _strikePriceUSD;
+    strikePriceCents = _strikePriceCents;
     maturityTime = _maturityTime;
     premiumAmount = _premiumAmount;
     cancellationTime = _cancellationTime;
     isActive = false;
-    OrderBook(orderBookAddress).addOption(address(this), maturityTime, strikePriceUSD);
+    OrderBook(orderBookAddress).addOption(address(this), maturityTime, strikePriceCents);
   }
 
   function activateContract(bool traderType, address orderBookAddress) payable public {
@@ -81,7 +81,7 @@ contract Option {
     }
     isActive = true;
     optionSeller.transfer(premiumAmount);
-    OrderBook(orderBookAddress).deleteActivatedOption(address(this), maturityTime, strikePriceUSD);
+    OrderBook(orderBookAddress).deleteActivatedOption(address(this), maturityTime, strikePriceCents);
   }
 
   function exerciseExternalPrice (uint _currentETHPrice) public {
@@ -90,10 +90,10 @@ contract Option {
     require(block.timestamp < maturityTime);
     require(optionType == false);
     require(inTheMoney(currentETHPrice));
-    uint writerSettlementAmount = (strikePriceUSD * underlyingAmount)/currentETHPrice;
+    uint writerSettlementAmount = (strikePriceCents * underlyingAmount)/currentETHPrice;
     optionSeller.transfer(writerSettlementAmount);
 
-    /* uint holderSettlementAmout = ((currentETHPrice - strikePriceUSD)/currentETHPrice) * underlyingAmount; */
+    /* uint holderSettlementAmout = ((currentETHPrice - strikePriceCents)/currentETHPrice) * underlyingAmount; */
     uint holderSettlementAmout = address(this).balance; // whatever is left over!
     selfdestruct(optionBuyer); //TODO(moezinia) !!! does this work??
     /* optionBuyer.transfer(holderSettlementAmout); */
@@ -128,6 +128,6 @@ contract Option {
   function inTheMoney(uint _currentETHPrice) public view returns (bool) {
     // TODO(eforde): verify price is correct, or fetch price from on-chain
     // fiat contract
-    return (optionType && (_currentETHPrice < strikePriceUSD)) || (!optionType && (_currentETHPrice > strikePriceUSD));  // pul || call
+    return (optionType && (_currentETHPrice < strikePriceCents)) || (!optionType && (_currentETHPrice > strikePriceCents));  // pul || call
   }
 }
