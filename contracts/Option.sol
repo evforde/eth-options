@@ -92,15 +92,11 @@ contract Option {
     require(inTheMoney(currentETHPrice));
     uint writerSettlementAmount = (strikePriceUSD * underlyingAmount)/currentETHPrice;
     optionSeller.transfer(writerSettlementAmount);
-    emit LogTransferMade(address(this), optionSeller, writerSettlementAmount);
-
 
     /* uint holderSettlementAmout = ((currentETHPrice - strikePriceUSD)/currentETHPrice) * underlyingAmount; */
     uint holderSettlementAmout = address(this).balance; // whatever is left over!
     selfdestruct(optionBuyer); //TODO(moezinia) !!! does this work??
     /* optionBuyer.transfer(holderSettlementAmout); */
-    emit LogTransferMade(address(this), optionBuyer, holderSettlementAmout);
-
     isActive = false;
 
   }

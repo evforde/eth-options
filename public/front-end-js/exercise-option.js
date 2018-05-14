@@ -20,7 +20,7 @@ $(document).ready(function() {
         value: valueToSend
       }
       //TODO(moezinia) get from ejs...
-      var smartContractAddress = "0xACf81CD62c1ac1663c8E136f490C22D7dFA0Da0a";
+      // var smartContractAddress = "0xACf81CD62c1ac1663c8E136f490C22D7dFA0Da0a";
 
       const optionContract = web3.eth.contract(OptionContractABI, null, fallbackValues);
       const optionSmartContract = optionContract.at(smartContractAddress);

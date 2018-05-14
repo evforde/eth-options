@@ -271,12 +271,13 @@ function deployOptionContract(premium, traderType) { // true = buyer, false = se
   // TODO(eforde): this is actually a week for demo purposes
   let cancellationTime = (new Date().getTime() / 1000) + (7 * 24 * 60 * 60);
   let premiumWei = premium * 1e18;
+  var strikeCents = strike*100;
   // buyer must send premium, seller must send 1 eth
   let msgValue = traderType ? premiumWei : 1e18;
   getMetamaskAccount(function(account) {
     var contractInstance = OptionContract.new(
       false,
-      strike,
+      strikeCents,
       maturityTimeSeconds,
       cancellationTime,
       premiumWei,

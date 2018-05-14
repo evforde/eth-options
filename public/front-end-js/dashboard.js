@@ -3,22 +3,26 @@ var account;
 
 var OptionContract;
 
-const CURRENT_ETH_PRICE = 301;
-
 function setAccount(acc) {
   account = acc;
 }
 
+
+
 $(document).ready(function() {
   OptionContract = web3.eth.contract(OptionContractABI);
-  
+
+  // getETHPrice((priceCents) => {
+  //   $("#eth-price-usd").text("The current price is $" + (priceCents/100).toString());
+  // });
+
   let userContracts = getActiveContractAddresses();
   getMetamaskAccount(function(account) {
     $.get('/static/ejs/order-item.ejs', function (template) {
       orderItemTemplate = ejs.compile(template);
       for (let i in userContracts) {
         loadOption(userContracts[i], (option) => {
-          // Insert options into the list sorted by maturity 
+          // Insert options into the list sorted by maturity
           let currentTime = new Date().getTime() / 1000;
           option.premiumAmount = option.premiumAmount / 1e18;
           option.maturityTime = new Date(option.maturityTime * 1000).toLocaleDateString();
@@ -35,11 +39,15 @@ $(document).ready(function() {
             );
             return;
           }
-          option.canExercise = CURRENT_ETH_PRICE >= option.strikePriceUSD; // TODO
-          // TODO(eforde): insert options by maturity date
-          let list = option.isActive ? "#active-orders" : "#pending-orders";
-          $(list).append(orderItemTemplate(option));
-          bindEventHandlers();
+
+          $.ajax()
+          getETHPrice((CURRENT_ETH_PRICE) => {
+            option.canExercise = CURRENT_ETH_PRICE >= (option.strikePriceUSD*100);
+            // TODO(eforde): insert options by maturity date
+            let list = option.isActive ? "#active-orders" : "#pending-orders";
+            $(list).append(orderItemTemplate(option));
+            bindEventHandlers();
+          });
         });
       }
     });
@@ -81,6 +89,7 @@ function bindEventHandlers() {
     );
   });
 }
+
 
 
 // Loads fields of option and returns fields as a dictionary if all loads are
