@@ -21,12 +21,12 @@ $(window).ready(function() {
 function recalculateOptionPrices() {
   let selectedDate = $(".date.selected").text();
   let timeUntilExpiry = new Date(selectedDate).getTime() - new Date().getTime();
-  let val = Math.sqrt(timeUntilExpiry / 60 / 30) / 10000;
+  let val = Math.sqrt(timeUntilExpiry / 60 / 60 / 4) / 10000;
   let options = [];
-  for (let i = 0; i < 100; i++) {
-    options.push({strike: 300 + i * 10, premium: .01 + i * .01 + val});
+  for (let i = 0; i < 60; i++) {
+    options.push({strike: 600 + i * 10, premium: 0 + i * .005 + val});
   }
-  populateOptions(options, 450);
+  populateOptions(options, currentETHPriceUSD);
 }
 
 function populateOptions(options, currentPrice) {

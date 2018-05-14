@@ -24,6 +24,7 @@ $(document).ready(function() {
           option.maturityTimeSeconds = option.maturityTime;
           option.maturityTime = new Date(option.maturityTimeSeconds * 1000).toLocaleDateString();
           option.cancellationTime = new Date(option.cancellationTime * 1000).toLocaleString();
+          option.strikePriceUSD = option.strikePriceCents / 100;
           if (option.optionSeller == account)
             option.position = "sell";
           else if (option.optionBuyer == account)
@@ -36,9 +37,9 @@ $(document).ready(function() {
             );
             return;
           }
-          option.canExercise = currentETHPriceUSD >= (option.strikePriceUSD*100);
+          option.canExercise = currentETHPriceUSD >= option.strikePriceUSD;
           let list = option.isActive ? "#active-orders" : "#pending-orders";
-          insertByPrice(list, option);
+          insertSorted(list, option);
           bindEventHandlers();
         });
       }
@@ -49,14 +50,14 @@ $(document).ready(function() {
   // const OrderBook = web3.eth.contract(OrderBookABI);
 });
 
-function insertByPrice(list, option) {
+function insertSorted(list, option) {
   let newRow = orderItemTemplate(option);
   let inserted = false;
   $(list + " .order-item").each(function(i, oldRow) {
     let oldRowMaturity = parseInt($(oldRow).attr("data-maturity"));
     let oldRowStrike = parseInt($(oldRow).attr("data-strike"));
     // Insert the new row in sorted order in the list
-    if (oldRowMaturity + oldRowStrike > option.maturityTimeSeconds + option.strikePriceUSD) {
+    if (oldRowMaturity + oldRowStrike > option.maturityTimeSeconds + option.strikePriceCents) {
       $(newRow).insertBefore($(oldRow));
       inserted = true;
       return false;
@@ -72,15 +73,20 @@ function bindEventHandlers() {
     if ($(this).attr("data-can-exercise"))
       showPopup(
         "Exercise option?",
-        "The the settlement in ethereum will be sent to your address.",
+        "The the settlement value in ethereum will be sent to your wallet address.",
         null,
         null,
         function(resp) {
           if (!resp.success)
             return;
           // TODO(eforde): excercise contract
-        },
-        150
+          showNotifyPopup(
+            "Waiting to mine...",
+            "Follow progress <a href=\"https://ropsten.etherscan.io/tx/" +
+            "\" target=\"_blank\">here</a>. Do not " +
+            "leave this page."
+          );
+        }
       );
   });
   $(".order-item.pending").click(function(e) {
@@ -93,8 +99,7 @@ function bindEventHandlers() {
         if (!resp.success)
           return;
         // TODO(eforde): cancel contract
-      },
-      150
+      }
     );
   });
 }
@@ -128,5 +133,5 @@ function loadOption(addr, callback) {
   optionContract.premiumAmount.call(callbackProducer("premiumAmount"));
   optionContract.optionCreatorType.call(callbackProducer("optionCreatorType"));
   optionContract.maturityTime.call(callbackProducer("maturityTime"));
-  optionContract.strikePriceUSD.call(callbackProducer("strikePriceUSD"));
+  optionContract.strikePriceCents.call(callbackProducer("strikePriceCents"));
 }

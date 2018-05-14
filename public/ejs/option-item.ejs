@@ -1,5 +1,4 @@
-<!-- These are items displaying generated strikes and average of bid/ask prices...  -->
-<% if (typeof currentPrice != "number" || !currentPrice) { currentPrice = false; } %>
+<% if (typeof currentPrice != "string" || !currentPrice) { currentPrice = false; } %>
 <% if (!currentPrice) { %>
 <div class="option-item" data-strike="<%=strike%>">
   <div class="strike-info">

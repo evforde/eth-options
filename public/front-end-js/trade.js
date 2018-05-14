@@ -1,35 +1,20 @@
 var OptionContract;
 
 var contractAddresses = [
-  "0x500e05b522a32c3a422b24d19d7daab1bf57cd8b",
-  "0x2715f8e4937a931740623af376aeece2d73f16fb",
-  "0x48778dbc5e4d0c926e3df4f51fc7e344cea35d81",
-  "0xaaf4e7e42bb0adecb35f501bad8dd0c0035bc870",
-  "0x6b476e0b83140a25c141427732513124e6c5171d",
-  "0xafc8845d4a717f2bd42834a9d09ea650c221d22e",
-  "0x15ec8ad83d4d985117eef9d1419ddf380446a4a0",
-  "0xbc0ca4e74cba96e55c2b97dce739d3b467b2393c",
-  "0xa8bf717b276bcee5f438c9a4d5cc056c5186c68b",
-  "0x2b09092a8690f3c55c62eb9186c2b1ee6c5de319",
-  "0x722ae5125287ab52968c9ff25205dc0741f96f5c",
-  "0xedadb1b3f0181f190a7fd6c9ce360c5f469a5d11",
-  "0x61db6c0139beda77aca37474889a90a3600308c9",
-  "0x421b39b33c7432f4f3122a569d21132764713f1d",
-  "0xd6fae588aa8ea986ee4b2cfb6b7059d14fa036a8",
-  "0x1223edff95308973dc92e9e711046e3fdeb8d121",
-  "0xf617dcd952f77d552165d3eed87f9121719f940b",
-  "0xa6e96b48f3f67df8cd00d9d9d50cdc9df80450d3",
-  "0xc6e85589c3cc7bc371a95abd7ebb79f8899b3fd7",
-  "0xe26eafedc2322e773f7b0d8d62558c53f17a5a8a",
-  "0x270145bdf0921884c1c2902ec67e241b8643d566",
-  "0x3d4c5b811542603efe5f2a7594590ff1c6827031",
-  "0x8aaf69dddffc8ca1cfb0faea5489dcc9eb982894",
-  "0x9337aefe88171badf438f0ca163e056bb02221b0",
-  "0x40ccb21d59cb79a3accdbbd7fb66175b1477f5e4",
-  "0xf09c80dca93ac3a78c69ba940a3369e38eda5a6b",
-  "0xdde23dee545b49c8f4097b27e2a49f39086e7f25",
-  "0xa7b92bc31a624d7fe2bc432dee7fa61141d239a8",
-  "0x389e05bd011e965df7a5f2614461c9845247002c",
+  "0x3ab30d2f61848c43d77ddcdda0204bedce0b2baf",
+  "0x20ddfa6251940966d5fb2f35c8f69524736c91e5",
+  "0xabc4e26ba55455d0c38f71ffb567cb9e061491c0",
+  "0xb85dd51c9010250802175cbfcbe62f3c956758c5",
+  "0xc35e6630aa1fd2b7220ed06ecaf47dc5901ca755",
+  "0x747499bbd6d0cd86649c7b7ad0c057e7a4bd3397",
+  "0x46a0406b97385821023685a02cf34f353ae0dc3a",
+  "0x59cd4ba50f5f58f2ce8fad28d28a00cd918221b6",
+  "0xce1beaa8911647359e3e9dfb97f032c7f4826ef9",
+  "0xbf1adb9c16559cb45e65c6dc26396bd2e38df7bc",
+  "0x9e950c72d7c65b99b2f7f40ab0cc7ca0d24c2580",
+  "0xff0c08135d48b85e0531eb715dcfe3ff9a14db5d",
+  "0xb81a35257bb3a9bf54b6903c3c12f560d3a25eae",
+  "0x7506dfb9d5e73ca774ec47bbbb79f3ae31b364b2",
 ];
 
 // We can test canceling with these
@@ -152,7 +137,6 @@ function bindEventHandlers() {
           // Prompt the user to send the collateral to the smart contract
           optionContract.activateContract(
             false,
-            orderBookAddress,
             { value: 1e18, gas: 2e5 },
             (err, txnHash) => {
               if (err) {
@@ -216,6 +200,7 @@ function bindEventHandlers() {
         // Prompt the user to send the premium to the smart contract
         optionContract.activateContract(
           true,
+          0x743EfAD0CC1c2BB75704671fe6B2F6911E9d1eAE,
           { value: premium * 1e18, gas: 2e5 },
           (err, txnHash) => {
             if (err) {

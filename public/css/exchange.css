@@ -5,7 +5,7 @@
   z-index: 5;
 }
 #expiration-dates {
-  height: 60px;
+  height: 52px;
   max-height: 60px;
   overflow-x: auto;
   overflow-y: hidden;
@@ -18,11 +18,11 @@
 }
 .date {
   display: inline-block;
-  margin: 6px 3px;
+  margin: 6px 12px;
   padding: 10px;
   /* background-color: #555; */
   opacity: 0.97;
-  font-size: 24px;
+  font-size: 16px;
   font-weight: 100;
   /* color: white; */
   color: #4e4e9d;
@@ -57,14 +57,14 @@
 #current-price-marker p {
   height: 30px;
   position: relative;
-  top: 4px;
+  top: 6px;
   color: #333;
   width: 100%;
   text-align: center;
 }
 .option-item {
-  max-height: 85px;
-  height: 85px;
+  max-height: 80px;
+  height: 80px;
   width: 100%;
   border-bottom: 1px solid #aaa !important;
   transition: .2s;
@@ -79,7 +79,7 @@
   border-right-color: #f00; /* TODO */
 }
 .option-item > * {
-  height: 85px;
+  height: 80px;
   float: left;
 }
 .option-item .strike-info {
@@ -90,7 +90,7 @@
 .option-item .strike-info .strike {
   font-size: 20px;
   color: #333;
-  font-size: 24px;
+  font-size: 20px;
   white-space: nowrap;
   max-width: 80%;
   overflow: hidden;
@@ -106,12 +106,12 @@
   width: 100px;
   color: #fff;
   background-color: #eee;
-  font-size: 24px;
+  font-size: 20px;
   padding-right: 2px;
   transition: .2s;
   overflow: hidden;
   text-align: center;
 }
 .option-item .premium-info p {
-  margin-top: 30px;
+  margin-top: 32px;
 }

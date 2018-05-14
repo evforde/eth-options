@@ -14,6 +14,19 @@ function getCookie(cookieName="active_contracts") {
   return "";
 }
 
+// for debugging only
+function dedupeCookie() {
+  let currentCookie = getCookie("active_contracts");
+  let currentAddresses = currentCookie ? JSON.parse(currentCookie) : [];
+  let currentAddressSet = {};
+  for (let i in currentAddresses) {
+    currentAddressSet[currentAddresses[i]] = true;
+  }
+  let newAddresses = Object.keys(currentAddressSet);
+  document.cookie = "active_contracts=" + JSON.stringify(newAddresses) + 
+                    "; expires=Wed, 01 Jan 2020 00:00:00 UTC; path=/;";
+}
+
 function getActiveContractAddresses() {
   let currentCookie = getCookie("active_contracts");
   return currentCookie ? JSON.parse(currentCookie) : [];
@@ -39,6 +52,9 @@ function saveActiveContractAddress(addr) {
   // append another option to cookie
   else {
     let newCookie = JSON.parse(currentCookie);
+    for (let i in newCookie)
+      if (newCookie[i] == addr)
+        return;
     newCookie.push(addr);
     document.cookie = "active_contracts=" + JSON.stringify(newCookie) + 
                       "; expires=Wed, 01 Jan 2020 00:00:00 UTC; path=/;";

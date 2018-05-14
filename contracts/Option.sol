@@ -59,10 +59,10 @@ contract Option {
     premiumAmount = _premiumAmount;
     cancellationTime = _cancellationTime;
     isActive = false;
-    OrderBook(orderBookAddress).addOption(address(this), maturityTime, strikePriceCents);
+    // OrderBook(orderBookAddress).addOption(address(this), maturityTime, strikePriceCents);
   }
 
-  function activateContract(bool traderType, address orderBookAddress) payable public {
+  function activateContract(bool traderType) payable public {
     require(!isActive);
     require(traderType == !optionCreatorType);
     require(block.timestamp < cancellationTime); // TODO(eforde): otherwise cancel
@@ -81,7 +81,6 @@ contract Option {
     }
     isActive = true;
     optionSeller.transfer(premiumAmount);
-    OrderBook(orderBookAddress).deleteActivatedOption(address(this), maturityTime, strikePriceCents);
   }
 
   function exerciseExternalPrice (uint _currentETHPrice) public {
