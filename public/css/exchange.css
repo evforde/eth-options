@@ -39,6 +39,10 @@
   background-color: #3d3d74;
   color: #a6a6bd;
 }
+.date.selected:hover {
+  background-color: #3d3d74;
+  color: #c6c6c6;
+}
 #options-content {
   padding-top: 64px;
 }

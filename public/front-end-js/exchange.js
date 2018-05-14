@@ -5,15 +5,31 @@ var timeout = false;
 var delta = 200;
 
 $(window).ready(function() {
+  recalculateOptionPrices();
+
+  $(".date").click(function() {
+    $(".date").removeClass("selected");
+    $(this).addClass("selected");
+    recalculateOptionPrices();
+  });
+});
+
+
+// TODO(eforde): hardcoded for now :(
+function recalculateOptionPrices() {
+  let selectedDate = $(".date.selected").text();
+  let timeUntilExpiry = new Date(selectedDate).getTime() - new Date().getTime();
+  let val = Math.sqrt(timeUntilExpiry / 60 / 30) / 10000;
   let options = [];
   for (let i = 0; i < 100; i++) {
-    options.push({strike: 300 + i * 10, premium: .1 + i * .1});
+    options.push({strike: 300 + i * 10, premium: .01 + i * .01 + val});
   }
   populateOptions(options, 450);
-});
+}
 
 // TODO(eforde): Call this with real data from order book
 function populateOptions(options, currentPrice) {
+  $('#options').empty();
   $.get('/static/ejs/option-item.ejs', function (template) {
     let optionItemTemplate = ejs.compile(template);
     let scrollTop = 0;
@@ -36,8 +52,9 @@ function populateOptions(options, currentPrice) {
 function rebindEventHandlers() {
   $("#options .option-item:not(#current-price-marker)").click(function() {
     let strike = $(this).attr("data-strike");
+    let selectedDate = $(".date.selected").text();
     // TODO(eforde): redirect to proper trade page
-    window.location = "/trade?strike=" + strike + "&date=5/21/18";
+    window.location = "/trade?strike=" + strike + "&date=" + selectedDate;
   });
 }
 
