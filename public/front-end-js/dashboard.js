@@ -1,6 +1,7 @@
 // can play around in js console with this
 var account;
 
+var orderItemTemplate;
 var OptionContract;
 
 function setAccount(acc) {
@@ -20,7 +21,8 @@ $(document).ready(function() {
           // Insert options into the list sorted by maturity
           let currentTime = new Date().getTime() / 1000;
           option.premiumAmount = option.premiumAmount / 1e18;
-          option.maturityTime = new Date(option.maturityTime * 1000).toLocaleDateString();
+          option.maturityTimeSeconds = option.maturityTime;
+          option.maturityTime = new Date(option.maturityTimeSeconds * 1000).toLocaleDateString();
           option.cancellationTime = new Date(option.cancellationTime * 1000).toLocaleString();
           if (option.optionSeller == account)
             option.position = "sell";
@@ -36,7 +38,7 @@ $(document).ready(function() {
           }
           option.canExercise = currentETHPriceUSD >= (option.strikePriceUSD*100);
           let list = option.isActive ? "#active-orders" : "#pending-orders";
-          $(list).append(orderItemTemplate(option));
+          insertByPrice(list, option);
           bindEventHandlers();
         });
       }
@@ -46,6 +48,23 @@ $(document).ready(function() {
   //TODO(moezinia) turn on!
   // const OrderBook = web3.eth.contract(OrderBookABI);
 });
+
+function insertByPrice(list, option) {
+  let newRow = orderItemTemplate(option);
+  let inserted = false;
+  $(list + " .order-item").each(function(i, oldRow) {
+    let oldRowMaturity = parseInt($(oldRow).attr("data-maturity"));
+    let oldRowStrike = parseInt($(oldRow).attr("data-strike"));
+    // Insert the new row in sorted order in the list
+    if (oldRowMaturity + oldRowStrike > option.maturityTimeSeconds + option.strikePriceUSD) {
+      $(newRow).insertBefore($(oldRow));
+      inserted = true;
+      return false;
+    }
+  });
+  if (!inserted)
+    $(list).append(newRow);
+}
 
 function bindEventHandlers() {
   $(".order-item").unbind("click");
