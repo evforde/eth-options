@@ -8,6 +8,8 @@ $(window).ready(function() {
   recalculateOptionPrices();
 
   $(".date").click(function() {
+    if ($(this).hasClass("selected"))
+      return;
     $(".date").removeClass("selected");
     $(this).addClass("selected");
     recalculateOptionPrices();
@@ -15,7 +17,7 @@ $(window).ready(function() {
 });
 
 
-// TODO(eforde): hardcoded for now :(
+// TODO(eforde): Fetch real data from order book
 function recalculateOptionPrices() {
   let selectedDate = $(".date.selected").text();
   let timeUntilExpiry = new Date(selectedDate).getTime() - new Date().getTime();
@@ -27,7 +29,6 @@ function recalculateOptionPrices() {
   populateOptions(options, 450);
 }
 
-// TODO(eforde): Call this with real data from order book
 function populateOptions(options, currentPrice) {
   $('#options').empty();
   $.get('/static/ejs/option-item.ejs', function (template) {
@@ -44,8 +45,9 @@ function populateOptions(options, currentPrice) {
     }
     rebindEventHandlers();
     recalcAnimations();
-    // TODO(eforde): scroll to current price
-    $("body").animate({ scrollTop: $(document).height() }, 700);
+    $("#current-price-marker")[0].scrollIntoView({
+      behavior: "smooth",
+    });
   });
 }
 
@@ -53,7 +55,6 @@ function rebindEventHandlers() {
   $("#options .option-item:not(#current-price-marker)").click(function() {
     let strike = $(this).attr("data-strike");
     let selectedDate = $(".date.selected").text();
-    // TODO(eforde): redirect to proper trade page
     window.location = "/trade?strike=" + strike + "&date=" + selectedDate;
   });
 }
